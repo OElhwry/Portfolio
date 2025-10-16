@@ -119,6 +119,16 @@ export default function PortfolioPage() {
               </ul>
             </nav>
           </div>
+           {/* GitHub link */}
+      <div className="mt-10">
+        <Link
+          href="https://github.com/your-username/explore-space"
+          target="_blank"
+          className="inline-block text-sm font-medium text-teal-300 hover:text-teal-200 transition"
+        >
+          View on GitHub →
+        </Link>
+      </div>
           </header>
 
     {/* RIGHT SCROLLABLE COLUMN */}
