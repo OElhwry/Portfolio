@@ -20,7 +20,7 @@ You’ll find:
 
 ## Inspiration
 
-This portfolio draws design inspiration from [Brittany Chiang](https://brittanychiang.com/), whose portfolio layout and user experience really stood out to me.  
+This portfolio draws design inspiration from [Brittany Chiang](https://v4.brittanychiang.com/), whose portfolio layout and user experience really stood out to me.  
 I admired her focus on subtle motion, structured typography, and minimalist design, and decided to recreate a similar layout while giving it my own style and content.
 
 I’ve rewritten the components, adjusted the structure, and customized every section to reflect **my personal brand, projects, and technical stack**.  
@@ -50,6 +50,10 @@ cd <your-repo-name>
 
 # 3. Install dependencies
 npm install
+
+---
+
+Built with passion, curiosity, and a few too many late-night coding sessions.
 
 # 4. Start the development server
 npm run dev
