@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import peerfitPreview from "../public/peerfit.png";
+import peerfitv1Preview from "../public/peerfitv1.png";
+import peerfitv2Preview from "../public/peerfitv2.png";
 import spacePreview from "../public/space.png";
 
 export default function PortfolioPage() {
@@ -260,30 +261,33 @@ export default function PortfolioPage() {
             </ol>
           </section>
 
-                    {/* PROJECTS (hover stays same) */}
+          {/* PROJECTS */}
           <section id="projects" aria-label="Projects">
             <h2 className="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">
               Projects
             </h2>
 
             <ul className="group/list">
-              {/* PeerFit */}
+              {/* PeerFit V2 (latest) */}
               <li className="mb-12">
                 <a
                   href="/peerfit"
                   className="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 hover:!opacity-100 lg:group-hover/list:opacity-50"
                 >
-                  <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition lg:block group-hover:bg-slate-800/50 group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] group-hover:drop-shadow-lg"></div>
+                  <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition lg:block group-hover:bg-slate-800/50 group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] group-hover:drop-shadow-lg" />
                   <div className="z-10 sm:order-2 sm:col-span-6">
                     <h3 className="font-medium leading-tight text-slate-200 group-hover:text-teal-300">
-                      PeerFit
+                      PeerFit v2
                     </h3>
                     <p className="mt-2 text-sm leading-normal">
-                      A sports-matching platform that connects users by skill level
-                      and location, with real-time applications and an intuitive UI.
+                      The next evolution of PeerFit — a sports-matching platform that
+                      connects players by sport, skill level, and location. Built with
+                      modern tooling and powered by{" "}
+                      <span className="text-slate-200 font-medium">Supabase</span> for
+                      real-time features and authentication.
                     </p>
                     <ul className="mt-2 flex flex-wrap">
-                      {["React", "Firebase", "Tailwind CSS"].map((tag) => (
+                      {["React", "TypeScript", "Tailwind CSS", "Supabase"].map((tag) => (
                         <li key={tag} className="mr-1.5 mt-2">
                           <div className="rounded-full bg-teal-400/10 px-3 py-1 text-xs font-medium text-teal-300">
                             {tag}
@@ -293,28 +297,41 @@ export default function PortfolioPage() {
                     </ul>
                   </div>
                   <Image
-                    src={peerfitPreview}
-                    alt="PeerFit preview"
+                    src={peerfitv2Preview}
+                    alt="PeerFit V2 preview"
                     className="aspect-video object-cover rounded border-2 border-slate-200/10 transition group-hover:border-slate-200/30 sm:order-1 sm:col-span-2 sm:translate-y-1"
                   />
                 </a>
               </li>
 
               {/* Explore Space */}
-              <li>
+              <li className="mb-12">
                 <a
                   href="/explore-space"
                   className="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 hover:!opacity-100 lg:group-hover/list:opacity-50"
                 >
-                  <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition lg:block group-hover:bg-slate-800/50 group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] group-hover:drop-shadow-lg"></div>
+                  <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition lg:block group-hover:bg-slate-800/50 group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] group-hover:drop-shadow-lg" />
                   <div className="z-10 sm:order-2 sm:col-span-6">
                     <h3 className="font-medium leading-tight text-slate-200 group-hover:text-teal-300">
                       Explore Space
                     </h3>
                     <p className="mt-2 text-sm leading-normal">
-                      A space visualization app using NASA APIs to display real-time
-                      planetary data and imagery with smooth animations.
+                      A space visualization app built with{" "}
+                      <span className="text-slate-200 font-medium">v0.dev</span> to stay
+                      in sync with the latest AI-assisted tools. It uses NASA’s public
+                      API to stream live planetary data and imagery — from Mars’ surface
+                      to the edge of our solar system — all wrapped in a clean,
+                      interactive interface.
                     </p>
+                    <ul className="mt-2 flex flex-wrap">
+                      {["TypeScript", "Tailwind CSS", "v0.dev", "NASA API"].map((tag) => (
+                        <li key={tag} className="mr-1.5 mt-2">
+                          <div className="rounded-full bg-teal-400/10 px-3 py-1 text-xs font-medium text-teal-300">
+                            {tag}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                   <Image
                     src={spacePreview}
@@ -323,25 +340,27 @@ export default function PortfolioPage() {
                   />
                 </a>
               </li>
-           
-            
 
-            <li className="mb-12">
+              {/* PeerFit V1 (original) */}
+              <li>
                 <a
-                  href="/peerfit"
+                  href="/peerfit-v1"
                   className="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 hover:!opacity-100 lg:group-hover/list:opacity-50"
                 >
-                  <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition lg:block group-hover:bg-slate-800/50 group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] group-hover:drop-shadow-lg"></div>
+                  <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition lg:block group-hover:bg-slate-800/50 group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] group-hover:drop-shadow-lg" />
                   <div className="z-10 sm:order-2 sm:col-span-6">
                     <h3 className="font-medium leading-tight text-slate-200 group-hover:text-teal-300">
-                      PeerFit
+                      PeerFit v1
                     </h3>
                     <p className="mt-2 text-sm leading-normal">
-                      A sports-matching platform that connects users by skill level
-                      and location, with real-time applications and an intuitive UI.
+                      The original version of PeerFit, built with PHP, HTML, CSS, and
+                      JavaScript on{" "}
+                      <span className="text-slate-200 font-medium">XAMPP</span>. It
+                      introduced user accounts, activity posts, and basic matching logic
+                      — setting the groundwork for the newer React-powered rebuild.
                     </p>
                     <ul className="mt-2 flex flex-wrap">
-                      {["React", "Firebase", "Tailwind CSS"].map((tag) => (
+                      {["PHP", "HTML", "CSS", "JavaScript", "XAMPP"].map((tag) => (
                         <li key={tag} className="mr-1.5 mt-2">
                           <div className="rounded-full bg-teal-400/10 px-3 py-1 text-xs font-medium text-teal-300">
                             {tag}
@@ -351,13 +370,13 @@ export default function PortfolioPage() {
                     </ul>
                   </div>
                   <Image
-                    src={peerfitPreview}
-                    alt="PeerFit preview"
+                    src={peerfitv1Preview}
+                    alt="PeerFit V1 preview"
                     className="aspect-video object-cover rounded border-2 border-slate-200/10 transition group-hover:border-slate-200/30 sm:order-1 sm:col-span-2 sm:translate-y-1"
                   />
                 </a>
               </li>
-              </ul>
+            </ul>
           </section>
         </div>
       </div>
