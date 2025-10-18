@@ -4,7 +4,6 @@ import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
 import peerfitV2 from "../../public/peerfitv2.png";
 import peerfitV2Feed from "../../public/peerfitv2feed.png";
 import peerfitV2Feed2 from "../../public/peerfitv2feed2.png";
@@ -14,7 +13,6 @@ import peerfitV2Settings from "../../public/peerfitv2settings.png";
 import peerfitV2Signup from "../../public/peerfitv2signup.png";
 import peerfitV1Preview from "../../public/peerfitv1.png";
 import peerfitV1Signup from "../../public/peerfitsignup.png";
-import peerfitV1Main from "../../public/peerfitmain.png";
 
 type Screenshot = {
   src: StaticImageData;
@@ -80,8 +78,12 @@ export default function PeerfitV2Page() {
   }, [openIndex]);
 
   // Generate glow color based on cursor position
+let glowColor = "hsla(210, 80%, 60%, 0.15)";
+if (typeof window !== "undefined") {
   const hue = (cursor.x / window.innerWidth) * 360;
-  const glowColor = `hsla(${hue}, 80%, 60%, 0.15)`;
+  glowColor = `hsla(${hue}, 80%, 60%, 0.15)`;
+}
+
 
   return (
     <main
