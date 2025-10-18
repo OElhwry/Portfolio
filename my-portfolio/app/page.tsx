@@ -61,7 +61,7 @@ export default function PortfolioPage() {
             <h1 className="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">
               <a href="/">Omar El hawary</a>
             </h1>
-            <h2 className="mt-3 text-lg font-medium text-slate-200 sm:text-xl">
+            <h2 className="mt-3 text-lg font-mono font-medium text-slate-300 sm:text-xl">
               Front End Developer
             </h2>
             <p className="mt-4 max-w-xs leading-relaxed">

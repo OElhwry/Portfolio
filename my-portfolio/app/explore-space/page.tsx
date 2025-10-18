@@ -1,15 +1,26 @@
 "use client";
 
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect,useRef, useState } from "react";
 import spacePreview from "../../public/space.png";
+import { motion } from "framer-motion";
+
+type Screenshot = {
+  src: StaticImageData;
+  alt: string;
+  caption: string;
+};
+
+const SCREENSHOTS: Screenshot[] = [
+      { src: spacePreview, alt: "Explore-Space - landing", caption: "Landing / Browse" },
+];
 
 export default function PortfolioPage() {
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [activeSection, setActiveSection] = useState("about");
-
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   // Track mouse for glow effect
   useEffect(() => {
@@ -44,6 +55,19 @@ export default function PortfolioPage() {
     return () => observer.disconnect();
   }, []);
 
+      useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+          if (openIndex === null) return;
+          if (e.key === "Escape") setOpenIndex(null);
+          if (e.key === "ArrowLeft")
+            setOpenIndex((i) => (i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length));
+          if (e.key === "ArrowRight")
+            setOpenIndex((i) => (i === null ? null : (i + 1) % SCREENSHOTS.length));
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+      }, [openIndex]);
+
   return (
 <main className="relative bg-slate-900 text-slate-400 antialiased selection:bg-teal-300 selection:text-teal-900">
   {/* Back to Portfolio */}
@@ -77,12 +101,42 @@ export default function PortfolioPage() {
             <h1 className="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">
               <a href="/">Explore Space</a>
             </h1>
-            <h2 className="mt-3 text-lg font-medium text-slate-200 sm:text-xl">
+            <h2 className="mt-3 text-lg font-mono font-medium text-slate-300 sm:text-xl">
               To Infinity and Beyond!
             </h2>
             <p className="mt-4 max-w-xs leading-relaxed">
               Built to entertain and educate space enthusiasts, the app explores planets in order, showing distances, facts, and interactive quizzes. 
             </p>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mt-6 flex flex-wrap gap-2 max-w-xs"
+            >
+              {["TypeScript", "Tailwind CSS", "v0.dev", "NASA API"].map((tech) => (
+                <div
+                  key={tech}
+                  className="px-3 py-1 rounded-md bg-white/5 backdrop-blur-sm border border-white/5 text-xs text-slate-100 inline-flex items-center gap-2 hover:scale-[1.05] hover:border-indigo-400/30 transition"
+                >
+                  <span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{
+                      background:
+                        tech === "TypeScript"
+                          ? "#3178c6"
+                          : tech === "Tailwind CSS"
+                          ? "#06b6d4"
+                          : tech === "v0.dev"
+                          ? "#8b5cf6"
+                          : "#fbbf24", // NASA API (gold)
+                    }}
+                  />
+                  <span className="font-medium">{tech}</span>
+                </div>
+              ))}
+            </motion.div>
+
 
             {/* Navigation */}
             <nav className="mt-16 hidden lg:block" aria-label="Main sections">
@@ -172,39 +226,105 @@ export default function PortfolioPage() {
       </section>
 
       {/* IMAGES */}
-      <section id="images" className="scroll-mt-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Image
-            src={spacePreview}
-            alt="Explore Space interface"
-            className="rounded-lg border border-slate-700 object-cover shadow-md hover:shadow-teal-500/10 transition-shadow duration-300"
-          />
-          <Image
-            src={spacePreview}
-            alt="Explore Space dashboard"
-            className="rounded-lg border border-slate-700 object-cover shadow-md hover:shadow-teal-500/10 transition-shadow duration-300"
-          />
-        </div>
-        <p className="text-sm text-slate-500 text-center">
-          *Preview images from the Explore Space interface.*
-        </p>
-      </section>
+      <motion.section
+  id="images"
+  className="scroll-mt-24"
+  initial={{ opacity: 0, y: 12 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+>
+  {/* Header */}
+  <div className="flex flex-col items-center text-center mb-10">
+    <h3 className="text-2xl font-semibold text-slate-100">Explore Space Gallery</h3>
+    <p className="mt-2 text-sm text-slate-400 max-w-lg">
+      Discover the Explore Space interface — designed for curiosity, creativity, and seamless exploration through immersive visuals.
+    </p>
+    <div className="mt-4 h-px w-24 bg-gradient-to-r from-indigo-500/40 via-indigo-400/80 to-indigo-500/40 rounded-full" />
+  </div>
+
+  {/* Framed Container */}
+  <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/10 hover:border-indigo-400/20 transition-all duration-500">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {SCREENSHOTS.map((s, i) => (
+        <motion.button
+          key={i}
+          onClick={() => setOpenIndex(i)}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: i * 0.05 }}
+          whileHover={{ scale: 1.02 }}
+          className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:border-indigo-400/30 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all duration-300"
+        >
+          {/* Image */}
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <Image
+              src={s.src}
+              alt={s.alt}
+              className="object-cover w-full h-full rounded-xl transition-transform duration-500 group-hover:scale-105"
+            />
+            {/* Overlay gradient on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300" />
+          </div>
+
+          {/* Caption below image */}
+          <div className="px-3 py-2 bg-white/5 text-left text-xs text-slate-200 font-medium border-t border-white/10">
+            {s.caption}
+          </div>
+
+          {/* Floating hover label */}
+          <div className="absolute top-3 right-3 bg-indigo-400/10 text-[10px] uppercase tracking-wide px-2 py-1 rounded-full text-indigo-300 font-semibold backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all">
+            View
+          </div>
+        </motion.button>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
 
       {/* INSIGHTS */}
-      <section id="insights" aria-label="Insights">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">
-            Insights
-        </h2>
-        <p>
-          Working on this project helped me refine API integration, animation
-          control, and UI responsiveness. I also learned how visual hierarchy
-          can transform technical data into a more meaningful story.
-        </p>
-        <p>
-          Future plans include adding Supabase authentication, real-time mission
-          tracking, and an interactive solar system map.
-        </p>
-      </section>
+<section id="insights" aria-label="Insights" className="space-y-4 scroll-mt-24">
+  <h2 className="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">
+    Insights
+  </h2>
+
+  <p>
+    Building Explore Space gave me a deeper understanding of how design, data, and
+    interactivity can work together to create a memorable user experience. I learned how
+    to connect real-time{" "}
+    <span className="text-slate-200 font-medium">
+      <a href="https://api.nasa.gov/" target="_blank" rel="noreferrer">
+        NASA APIs
+      </a>
+    </span>{" "}
+    with a clean, responsive interface — ensuring that each piece of planetary
+    information not only loaded efficiently but also felt engaging and visually grounded.
+  </p>
+
+  <p>
+    On the front-end side, I refined my approach to animation timing and user
+    feedback, focusing on how subtle motion can guide attention and create flow
+    rather than distraction. The process also helped me appreciate how visual hierarchy
+    and layout choices can turn complex datasets into a story that users actually want
+    to explore.
+  </p>
+
+  <p>
+    Looking ahead, I plan to expand the project with{" "}
+    <span className="text-slate-200 font-medium">
+      <a href="https://supabase.com/" target="_blank" rel="noreferrer">
+        Supabase
+      </a>
+    </span>{" "}
+    authentication, personalized dashboards, and real-time mission tracking.
+    Another exciting step will be introducing an interactive 3D solar system map,
+    allowing users to navigate between planets and see live orbital data. These
+    features will take the app beyond static visualization into a truly dynamic
+    exploration tool.
+  </p>
+</section>
+
     </div>
   </div>
 
@@ -259,6 +379,70 @@ export default function PortfolioPage() {
           }
         }
       `}</style>
+       {/* Lightbox Modal */}
+            {openIndex !== null && (
+              <motion.div
+                key="lightbox"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6"
+                onClick={() => setOpenIndex(null)}
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                  className="relative max-w-5xl w-full max-h-[85vh] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Image
+                    src={SCREENSHOTS[openIndex].src}
+                    alt={SCREENSHOTS[openIndex].alt}
+                    className="object-contain w-full h-full bg-slate-900"
+                    priority
+                  />
+                  <div className="absolute top-3 right-3">
+                    <button
+                      onClick={() => setOpenIndex(null)}
+                      className="bg-white/10 hover:bg-white/20 text-white rounded-full p-2 backdrop-blur-sm"
+                      aria-label="Close"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-4 py-3 text-center text-slate-200 text-sm">
+                    {SCREENSHOTS[openIndex].caption}
+                  </div>
+                </motion.div>
+            
+                {/* Navigation arrows */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenIndex((i) =>
+                      i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length
+                    );
+                  }}
+                  className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white text-3xl font-bold select-none"
+                >
+                  ‹
+                </button>
+            
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenIndex((i) =>
+                      i === null ? null : (i + 1) % SCREENSHOTS.length
+                    );
+                  }}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white text-3xl font-bold select-none"
+                >
+                  ›
+                </button>
+              </motion.div>
+              )}
     </main>
   );
 }

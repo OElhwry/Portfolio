@@ -1,9 +1,9 @@
 "use client";
-import Image from "next/image";
+
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { StaticImageData } from "next/image"
 
 import peerfitV2 from "../../public/peerfitv2.png";
 import peerfitV2Feed from "../../public/peerfitv2feed.png";
@@ -12,14 +12,14 @@ import peerfitV2Login from "../../public/peerfitv2login.png";
 import peerfitV2Profile from "../../public/peerfitv2profile.png";
 import peerfitV2Settings from "../../public/peerfitv2settings.png";
 import peerfitV2Signup from "../../public/peerfitv2signup.png";
-import peerfitV1Preview from "../../public/peerfitv1.png"; // for evolution compare
+import peerfitV1Preview from "../../public/peerfitv1.png";
+import peerfitV1Signup from "../../public/peerfitsignup.png";
+import peerfitV1Main from "../../public/peerfitmain.png";
 
 type Screenshot = {
   src: StaticImageData;
   alt: string;
   caption: string;
-  w?: number;
-  h?: number;
 };
 
 const SCREENSHOTS: Screenshot[] = [
@@ -32,40 +32,32 @@ const SCREENSHOTS: Screenshot[] = [
   { src: peerfitV2Settings, alt: "PeerFit v2 - settings", caption: "Settings" },
 ];
 
+export default function PeerfitV2Page() {
+  const [cursor, setCursor] = useState({ x: 0, y: 0 });
+  const [activeSection, setActiveSection] = useState("about");
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
 
-export default function PortfolioPage() {
-    const [cursor, setCursor] = useState({ x: 0, y: 0 });
-    const [activeSection, setActiveSection] = useState("about");
-
-    const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
-    const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-    // Track mouse for glow effect
-    useEffect(() => {
+  // Cursor glow effect (color-shifting)
+  useEffect(() => {
     const move = (e: MouseEvent) => setCursor({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
-    }, []);
+  }, []);
 
-    // Track scroll position to highlight active section
-    useEffect(() => {
-    const sections = ["about", "images", "evolution"];
-    sections.forEach((id) => {
-        sectionsRef.current[id] = document.getElementById(id);
-    });
-    
+  // Scroll spy
+  useEffect(() => {
+    const ids = ["about", "images", "evolution"];
+    ids.forEach((id) => (sectionsRef.current[id] = document.getElementById(id)));
+
     const observer = new IntersectionObserver(
-        (entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-            }
-        });
-        },
-        { rootMargin: "-50% 0px -50% 0px" } // triggers when section center enters view
+      (entries) => {
+        entries.forEach((entry) => entry.isIntersecting && setActiveSection(entry.target.id));
+      },
+      { rootMargin: "-50% 0px -50% 0px" }
     );
 
-    sections.forEach((id) => {
+    ids.forEach((id) => {
       const el = sectionsRef.current[id];
       if (el) observer.observe(el);
     });
@@ -73,298 +65,455 @@ export default function PortfolioPage() {
     return () => observer.disconnect();
   }, []);
 
-  // keyboard navigation for lightbox
-    useEffect(() => {
-        function onKey(e: KeyboardEvent) {
-        if (openIndex === null) return;
-        if (e.key === "Escape") setOpenIndex(null);
-        if (e.key === "ArrowLeft") setOpenIndex((i) => (i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length));
-        if (e.key === "ArrowRight") setOpenIndex((i) => (i === null ? null : (i + 1) % SCREENSHOTS.length));
-        }
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [openIndex]);
+  // Lightbox keyboard controls
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (openIndex === null) return;
+      if (e.key === "Escape") setOpenIndex(null);
+      if (e.key === "ArrowLeft")
+        setOpenIndex((i) => (i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length));
+      if (e.key === "ArrowRight")
+        setOpenIndex((i) => (i === null ? null : (i + 1) % SCREENSHOTS.length));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openIndex]);
 
-    // helper to open modal
-    const openLightbox = (index: number) => setOpenIndex(index);
+  // Generate glow color based on cursor position
+  const hue = (cursor.x / window.innerWidth) * 360;
+  const glowColor = `hsla(${hue}, 80%, 60%, 0.15)`;
 
-    return (
-    <main className="relative bg-slate-900 text-slate-400 antialiased selection:bg-teal-300 selection:text-teal-900">
-        <div className="fixed top-6 left-6 z-50">
-        <Link
-        href="/"
-        className="text-sm font-medium text-slate-400 hover:text-teal-300 transition"
-        >
-        ← Back to Portfolio
+  return (
+    <main
+      className="relative min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-slate-400 antialiased selection:bg-teal-300 selection:text-teal-900 transition-colors duration-1000"
+    >
+      {/* Back link */}
+      <div className="fixed top-6 left-6 z-50">
+        <Link href="/" className="text-sm font-medium text-slate-400 hover:text-teal-300 transition">
+          ← Back to Portfolio
         </Link>
-        </div>
-        {/* Cursor glow */}
-        <div
+      </div>
+
+      {/* Cursor glow — now color-shifting */}
+      <div
         className="pointer-events-none fixed inset-0 z-0 transition duration-300"
         style={{
-            background: `radial-gradient(600px at ${cursor.x}px ${cursor.y}px, rgba(29,78,216,0.15), transparent 80%)`,
+          background: `radial-gradient(600px at ${cursor.x}px ${cursor.y}px, ${glowColor}, transparent 80%)`,
         }}
-        />
+      />
 
-        <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col px-6 py-12 font-sans md:px-12 md:py-16 lg:flex-row lg:justify-between lg:gap-6 lg:py-0">
+      {/* Main content */}
+      <div className="relative z-10 mx-auto flex max-w-screen-xl flex-col lg:flex-row lg:gap-10 px-6 md:px-12">
         {/* LEFT PANEL */}
-        <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[46%] lg:flex-col lg:justify-between lg:py-24">
-            <div>
-            <h1 className="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">
-                <a href="/">Peerfit v2</a>
-            </h1>
-            <h2 className="mt-3 text-lg font-medium text-slate-200 sm:text-xl">
-                Turning ‘we’re one short’ into ‘game on.’
-            </h2>
-            <p className="mt-4 max-w-xs leading-relaxed">
-                A social sports platform for finding partners and filling teams in your area
-            , redesigned from the ground up with real-time updates, sleek UI, and code that doesn’t miss its shot.
-            </p>
-        
-                <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mt-6 flex flex-wrap gap-2 max-w-xs"
+        <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[45%] lg:flex-col lg:justify-between py-16 lg:py-24">
+          <div>
+        <motion.h1
+        className="text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl"
+        animate={{ textShadow: "0 0 10px rgba(94,234,212,0.2)" }}
+        transition={{ duration: 1, repeat: Infinity, repeatType: "reverse" }}
+        >
+        Peerfit v2
+        </motion.h1>
+        <h2 className="mt-3 text-lg font-mono font-medium text-slate-300 sm:text-xl">
+        Because every game deserves a full team
+        </h2>
+        <p className="mt-4 max-w-xs leading-relaxed text-slate-300">
+        A redesigned social sports app that connects local players in seconds — 
+        turning missed matches into full courts and new connections.
+        </p>
+
+
+            {/* Tech tags */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mt-6 flex flex-wrap gap-2 max-w-xs"
             >
-            {["React", "TypeScript", "Tailwind", "Supabase"].map((tech) => (
+              {["React", "TypeScript", "Tailwind", "Supabase"].map((tech) => (
                 <div
-                key={tech}
-                className="px-3 py-1 rounded-md bg-white/5 backdrop-blur-sm border border-white/5 text-xs text-slate-100 inline-flex items-center gap-2 shadow-[0_6px_18px_rgba(0,245,160,0.03)] hover:scale-[1.02] transition"
+                  key={tech}
+                  className="px-3 py-1 rounded-md bg-white/5 backdrop-blur-sm border border-white/5 text-xs text-slate-100 inline-flex items-center gap-2 hover:scale-[1.05] hover:border-teal-400/30 transition"
                 >
-                <span
+                  <span
                     className="inline-block w-2 h-2 rounded-full"
                     style={{
-                    background:
+                      background:
                         tech === "React"
-                        ? "#61dafb"
-                        : tech === "TypeScript"
-                        ? "#3178c6"
-                        : tech === "Tailwind"
-                        ? "#06b6d4"
-                        : "#00F5A0",
+                          ? "#61dafb"
+                          : tech === "TypeScript"
+                          ? "#3178c6"
+                          : tech === "Tailwind"
+                          ? "#06b6d4"
+                          : "#00F5A0",
                     }}
-                />
-                <span className="font-medium">{tech}</span>
+                  />
+                  <span className="font-medium">{tech}</span>
                 </div>
-            ))}
+              ))}
             </motion.div>
-
 
             {/* Navigation */}
             <nav className="mt-16 hidden lg:block" aria-label="Main sections">
-                <ul className="space-y-2">
+              <ul className="space-y-2">
                 {["about", "images", "evolution"].map((id) => {
-                    const label = id.charAt(0).toUpperCase() + id.slice(1);
-                    const active = activeSection === id;
-                    return (
+                  const active = activeSection === id;
+                  return (
                     <li key={id}>
-                        <a
+                      <a
                         href={`#${id}`}
                         className={`group flex items-center py-2 ${
-                            active ? "text-slate-200" : "text-slate-500"
+                          active ? "text-slate-200" : "text-slate-500"
                         }`}
-                        >
+                      >
                         <span
-                            className={`mr-4 h-px transition-all ${
+                          className={`mr-4 h-px transition-all ${
                             active
-                                ? "w-16 bg-slate-200"
-                                : "w-8 bg-slate-600 group-hover:w-16 group-hover:bg-slate-200"
-                            }`}
+                              ? "w-16 bg-teal-400"
+                              : "w-8 bg-slate-600 group-hover:w-16 group-hover:bg-teal-300"
+                          }`}
                         />
                         <span
-                            className={`text-xs font-semibold uppercase tracking-widest transition-colors ${
-                            active ? "text-slate-200" : "group-hover:text-slate-200"
-                            }`}
+                          className={`text-xs font-semibold uppercase tracking-widest transition-colors ${
+                            active ? "text-slate-100" : "group-hover:text-slate-200"
+                          }`}
                         >
-                            {label}
+                          {id}
                         </span>
-                        </a>
+                      </a>
                     </li>
-                    );
+                  );
                 })}
-                </ul>
+              </ul>
             </nav>
-            </div>
-        </header>  
+          </div>
+        </header>
 
         {/* RIGHT PANEL */}
-        <div className="mt-8 lg:mt-0 lg:w-2/3">
+        <div className="flex-1 lg:pt-28 space-y-24">
           {/* ABOUT */}
-          <motion.section id="about" className="mb-20 scroll-mt-24" initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <div className="mt-4 max-w-3xl text-slate-300 space-y-4">
-              <p>
-                PeerFit v2 is a modern social fitness platform — built for connections and momentum. I rebuilt the product to be realtime, resilient, and delightful: Supabase handles auth, storage, and DB; React + TypeScript enable component-driven features; Tailwind provides consistent, responsive styling.
-              </p>
-              <p>
-                The product focuses on discoverability (nearby activities), lightweight groups, and a low-friction sign-up/engagement loop — with realtime updates so users see activity as it happens.
-              </p>
-            </div>
-          </motion.section>
+<motion.section
+  id="about"
+  className="scroll-mt-24"
+  initial={{ opacity: 0, y: 12 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+>
+  <div className="max-w-3xl text-slate-300 space-y-4">
+    <p>
+      PeerFit began with a simple idea — people love playing sports, but finding
+      that one last player or completing a team can be harder than expected.
+      Whether it’s a quick five-a-side game, a doubles tennis match, or a
+      weekend basketball run, there’s always someone missing. PeerFit was built
+      to bridge that gap, matching players by shared interests, location, and
+      availability to make spontaneous games easier to organize.
+    </p>
 
-          {/* IMAGES - Masonry Grid + Lightbox */}
-          <motion.section id="images" className="mb-20 scroll-mt-24" initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+    <p>
+      In PeerFit v2, the entire platform was reimagined and rebuilt from scratch.
+      The frontend was developed using{" "}
+      <span className="text-slate-200 font-medium">
+        <a href="https://react.dev/" target="_blank" rel="noreferrer">
+          React
+        </a>
+      </span>{" "}
+      and{" "}
+      <span className="text-slate-200 font-medium">
+        <a href="https://www.typescriptlang.org/" target="_blank" rel="noreferrer">
+          TypeScript
+        </a>
+      </span>, while{" "}
+      <span className="text-slate-200 font-medium">
+        <a href="https://supabase.com/" target="_blank" rel="noreferrer">
+          Supabase
+        </a>
+      </span>{" "}
+      powers authentication, storage, and real-time data. The interface was
+      redesigned with{" "}
+      <span className="text-slate-200 font-medium">
+        <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer">
+          Tailwind CSS
+        </a>
+      </span>{" "}
+      to emphasize clean hierarchy, motion feedback, and improved accessibility
+      across all devices.
+    </p>
 
-            {/* masonry via CSS columns */}
-            <div className="mt-6 -mx-2">
-              <div className="px-2 columns-1 sm:columns-2 md:columns-3 gap-4 [column-gap:1rem]">
-                {SCREENSHOTS.map((s, i) => (
-                  <div key={i} className="mb-4 break-inside-avoid transform-gpu transition-all duration-300 hover:scale-[1.02]">
-                    <button
-                      onClick={() => openLightbox(i)}
-                      aria-label={`Open ${s.caption}`}
-                      className="group w-full block rounded-xl overflow-hidden border border-white/6 shadow-[0_8px_20px_rgba(0,245,160,0.03)]"
-                      style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02))" }}
-                    >
-                      {/* device mock frame */}
-                      <div className="relative">
-                        <div className="absolute left-3 top-3 w-10 h-6 rounded-md bg-black/20 blur-sm opacity-30 pointer-events-none" />
-                        <Image src={s.src} alt={s.alt} className="w-full h-auto object-cover rounded-xl" />
-                        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-transparent group-hover:ring-teal-300/30 transition" />
-                      </div>
-                      <div className="px-3 py-2 bg-gradient-to-t from-transparent to-white/2 text-left">
-                        <div className="text-xs text-slate-200 font-medium">{s.caption}</div>
-                      </div>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+    <p>
+      Beyond connecting players, PeerFit v2 introduces a richer social layer.
+      Users can now browse activity feeds, send quick RSVPs, and receive
+      personalized match recommendations based on past activity. Live updates
+      show when matches fill up, new players join, or events are modified,
+      turning PeerFit into an active community rather than a static listing app.
+    </p>
 
-            <p className="mt-6 text-sm text-slate-500">Click any image to enlarge. Use ← → to navigate, Esc to close.</p>
-          </motion.section>
+    <p>
+      The goal wasn’t just a redesign — it was an evolution of purpose. PeerFit
+      v2 delivers faster performance, smoother navigation, and a far more
+      engaging experience. It represents both a technical leap and a creative
+      step forward in how people connect through sport.
+    </p>
+  </div>
+</motion.section>
+
+
+
+{/* IMAGES */}
+<motion.section
+  id="images"
+  className="scroll-mt-24"
+  initial={{ opacity: 0, y: 12 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+>
+  {/* Header */}
+  <div className="flex flex-col items-center text-center mb-10">
+    <h3 className="text-2xl font-semibold text-slate-100">Project Gallery</h3>
+    <p className="mt-2 text-sm text-slate-400 max-w-lg">
+      Explore the redesigned PeerFit v2 interface — from login to feed — built for clarity, connection, and real-time sports matching.
+    </p>
+    <div className="mt-4 h-px w-24 bg-gradient-to-r from-teal-500/40 via-teal-400/80 to-teal-500/40 rounded-full" />
+  </div>
+
+  {/* Framed Container */}
+  <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/10 hover:border-teal-400/20 transition-all duration-500">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {SCREENSHOTS.map((s, i) => (
+        <motion.button
+          key={i}
+          onClick={() => setOpenIndex(i)}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: i * 0.05 }}
+          whileHover={{ scale: 1.02 }}
+          className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:border-teal-400/30 hover:shadow-[0_0_15px_rgba(20,184,166,0.3)] transition-all duration-300"
+        >
+          {/* Image */}
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <Image
+              src={s.src}
+              alt={s.alt}
+              className="object-cover w-full h-full rounded-xl transition-transform duration-500 group-hover:scale-105"
+            />
+            {/* Overlay gradient on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300" />
+          </div>
+
+          {/* Caption below image */}
+          <div className="px-3 py-2 bg-white/5 text-left text-xs text-slate-200 font-medium border-t border-white/10">
+            {s.caption}
+          </div>
+
+          {/* Floating hover label */}
+          <div className="absolute top-3 right-3 bg-teal-400/10 text-[10px] uppercase tracking-wide px-2 py-1 rounded-full text-teal-300 font-semibold backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all">
+            View
+          </div>
+        </motion.button>
+      ))}
+    </div>
+  </div>
+
+  {/* Footer tip */}
+  <p className="mt-6 text-sm text-slate-500 text-center">
+    Click any image to enlarge. Use ← → to navigate, Esc to close.
+  </p>
+</motion.section>
+
 
           {/* EVOLUTION */}
-          <motion.section id="evolution" className="mb-20 scroll-mt-24" initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-              {/* left: bullets */}
-              <div className="space-y-4">
-                {[
-                  { title: "Architecture", body: "Monolith → Component-driven client app, modular APIs via Supabase." },
-                  { title: "Realtime", body: "Database and feed updates in realtime — users see posts & RSVPs instantly." },
-                  { title: "UX & Accessibility", body: "Cleaner flows, fewer clicks to create/join events, and improved keyboard support." },
-                  { title: "Deployment", body: "Local XAMPP → Cloud-hosted with CI & global CDN." },
-                ].map((item) => (
-                  <div key={item.title} className="flex gap-4 items-start">
-                    <div className="mt-1 shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-cyan-300 flex items-center justify-center text-black font-bold">✓</div>
-                    <div>
-                      <div className="text-sm font-semibold text-slate-100">{item.title}</div>
-                      <div className="text-sm text-slate-300">{item.body}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* right: visual compare (v1 blurred -> v2 crisp) */}
-              <div className="relative rounded-xl overflow-hidden border border-white/6 bg-white/2 backdrop-blur-sm">
-                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-black/20 pointer-events-none" />
-                <div className="grid grid-cols-2 gap-2 p-2">
-                  <div className="relative overflow-hidden rounded-lg border border-white/4">
-                    <Image src={peerfitV1Preview} alt="PeerFit v1 preview" className="object-cover w-full h-40 filter grayscale contrast-90 opacity-80" />
-                    <div className="absolute left-3 top-3 text-xs px-2 py-1 rounded bg-black/40 text-white">v1 — nostalgia</div>
-                  </div>
-                  <div className="relative overflow-hidden rounded-lg border border-white/4">
-                    <Image src={peerfitV2} alt="PeerFit v2 preview" className="object-cover w-full h-40" />
-                    <div className="absolute left-3 top-3 text-xs px-2 py-1 rounded bg-teal-600/20 text-teal-200">v2 — evolution</div>
-                  </div>
-                </div>
-                <div className="p-3 text-sm text-slate-300">
-                  A visual metaphor: the left is intentionally nostalgic (soft, muted), while the right is crisp, interactive, and built for modern usage.
-                </div>
-              </div>
+        <motion.section
+        id="evolution"
+        className="scroll-mt-24"
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        >
+        <div className="space-y-12">
+            <div className="max-w-3xl space-y-4">
+            <h3 className="text-xl font-semibold text-slate-100">Evolution of Peerfit</h3>
+            <p>
+                The journey from Peerfit v1 to v2 was more than just a facelift — it was a complete transformation 
+                in technology, design, and user experience. What began as a static prototype built with PHP and 
+                XAMPP evolved into a dynamic, real-time platform powered by React, TypeScript, Tailwind, and Supabase.
+            </p>
+            <p>
+                Every screen was redesigned from the ground up to emphasize speed, clarity, and usability. 
+                Let’s take a look at how Peerfit matured across different stages of its interface.
+            </p>
             </div>
-          </motion.section>
+
+            {/* 1️⃣ Main feed evolution */}
+            <div>
+            <h4 className="text-sm font-semibold uppercase text-slate-400 mb-2">
+                From Static to Real-Time Interaction
+            </h4>
+            <p className="text-slate-400 mb-4 max-w-3xl">
+                The original feed displayed fixed posts that required full-page refreshes. 
+                In v2, the feed updates in real time — showing new matches, activity joins, 
+                and recommendations instantly with a sleek, card-based UI.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative">
+                <Image
+                    src={peerfitV1Preview}
+                    alt="Peerfit v1 main feed"
+                    className="rounded-xl border border-white/10 object-cover w-full"
+                />
+                <div className="absolute top-3 left-3 bg-black/70 text-xs px-2 py-1 rounded-full text-white shadow-md">
+                    v1
+                </div>
+                </div>
+                <div className="relative">
+                <Image
+                    src={peerfitV2}
+                    alt="Peerfit v2 main feed"
+                    className="rounded-xl border border-white/10 object-cover w-full"
+                />
+                <div className="absolute top-3 left-3 bg-lime-500/80 text-xs px-2 py-1 rounded-full text-black font-semibold shadow-lg">
+                    v2
+                </div>
+                </div>
+            </div>
+            </div>
+
+            {/* 2️⃣ Signup evolution */}
+            <div>
+            <h4 className="text-sm font-semibold uppercase text-slate-400 mb-2">
+                From Clunky to Effortless Onboarding
+            </h4>
+            <p className="text-slate-400 mb-4 max-w-3xl">
+                The old signup process was functional but felt slow and heavy. 
+                Peerfit v2 simplifies this into a clean, two-step form with instant validation, 
+                dynamic error handling, and responsive layout that feels natural across devices.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative">
+                <Image
+                    src={peerfitV1Signup}
+                    alt="Peerfit v1 signup"
+                    className="rounded-xl border border-white/10 object-cover w-full"
+                />
+                <div className="absolute top-3 left-3 bg-black/70 text-xs px-2 py-1 rounded-full text-white shadow-md">
+                    v1
+                </div>
+                </div>
+                <div className="relative">
+                <Image
+                    src={peerfitV2Signup}
+                    alt="Peerfit v2 signup"
+                    className="rounded-xl border border-white/10 object-cover w-full"
+                />
+                <div className="absolute top-3 left-3 bg-lime-500/80 text-xs px-2 py-1 rounded-full text-black font-semibold shadow-lg">
+                    v2
+                </div>
+                </div>
+            </div>
+            </div>
+
+            {/* 3️⃣ Profiles & Settings */}
+            <div>
+            <h4 className="text-sm font-semibold uppercase text-slate-400 mb-2">
+                Expanding the Social Core
+            </h4>
+            <p className="text-slate-400 mb-4 max-w-3xl">
+                Peerfit v1 was all about finding games. Peerfit v2 added depth — player profiles, 
+                personal stats, and customizable settings that give each user a sense of identity 
+                and control. The visual hierarchy makes editing fast and intuitive.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative">
+                <Image
+                    src={peerfitV2Profile}
+                    alt="Peerfit v2 profile"
+                    className="rounded-xl border border-white/10 object-cover w-full"
+                />
+                <div className="absolute top-3 left-3 bg-lime-500/80 text-xs px-2 py-1 rounded-full text-black font-semibold shadow-lg">
+                    v2
+                </div>
+                </div>
+                <div className="relative">
+                <Image
+                    src={peerfitV2Settings}
+                    alt="Peerfit v2 settings"
+                    className="rounded-xl border border-white/10 object-cover w-full"
+                />
+                <div className="absolute top-3 left-3 bg-lime-500/80 text-xs px-2 py-1 rounded-full text-black font-semibold shadow-lg">
+                    v2
+                </div>
+                </div>
+            </div>
+            </div>
+
+        </div>
+        </motion.section>
         </div>
       </div>
-
       {/* Lightbox Modal */}
-      <AnimatePresence>
-        {openIndex !== null && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            aria-modal="true"
-            role="dialog"
-            onClick={() => setOpenIndex(null)}
-          >
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-            <motion.div
-              className="relative z-50 max-w-[1100px] w-full rounded-2xl overflow-hidden"
-              initial={{ y: 20, scale: 0.98 }}
-              animate={{ y: 0, scale: 1 }}
-              exit={{ y: 20, scale: 0.98 }}
-              transition={{ duration: 0.18 }}
-              onClick={(e) => e.stopPropagation()} // prevent closing on inner click
-            >
-              <div className="bg-[#03121a] p-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="text-sm font-semibold text-slate-100">Preview</div>
-                  <div className="text-xs text-slate-400"> — {SCREENSHOTS[openIndex].caption}</div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    aria-label="Previous"
-                    onClick={() => setOpenIndex((i) => (i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length))}
-                    className="rounded-md px-3 py-1 bg-white/5 text-slate-200 hover:bg-white/6 transition"
-                  >
-                    ←
-                  </button>
-                  <button
-                    aria-label="Next"
-                    onClick={() => setOpenIndex((i) => (i === null ? null : (i + 1) % SCREENSHOTS.length))}
-                    className="rounded-md px-3 py-1 bg-white/5 text-slate-200 hover:bg-white/6 transition"
-                  >
-                    →
-                  </button>
-                  <button
-                    aria-label="Close"
-                    onClick={() => setOpenIndex(null)}
-                    className="rounded-md px-3 py-1 bg-white/5 text-slate-200 hover:bg-white/6 transition"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
+{openIndex !== null && (
+  <motion.div
+    key="lightbox"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6"
+    onClick={() => setOpenIndex(null)}
+  >
+    <motion.div
+      initial={{ scale: 0.95, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.95, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 200, damping: 25 }}
+      className="relative max-w-5xl w-full max-h-[85vh] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Image
+        src={SCREENSHOTS[openIndex].src}
+        alt={SCREENSHOTS[openIndex].alt}
+        className="object-contain w-full h-full bg-slate-900"
+        priority
+      />
+      <div className="absolute top-3 right-3">
+        <button
+          onClick={() => setOpenIndex(null)}
+          className="bg-white/10 hover:bg-white/20 text-white rounded-full p-2 backdrop-blur-sm"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-4 py-3 text-center text-slate-200 text-sm">
+        {SCREENSHOTS[openIndex].caption}
+      </div>
+    </motion.div>
 
-              <div className="bg-[#04171e] p-6 flex items-center justify-center">
-                <Image src={SCREENSHOTS[openIndex].src} alt={SCREENSHOTS[openIndex].alt} className="object-contain max-h-[75vh] w-auto" />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    {/* Navigation arrows */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpenIndex((i) =>
+          i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length
+        );
+      }}
+      className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white text-3xl font-bold select-none"
+    >
+      ‹
+    </button>
 
-      {/* Keyframes */}
-      <style jsx global>{`
-        @keyframes bgShift {
-          0% { transform: translate3d(0,0,0) }
-          50% { transform: translate3d(-5%, 2%, 0) }
-          100% { transform: translate3d(0,0,0) }
-        }
-        @keyframes bgShift2 {
-          0% { background-position: 0% 50% }
-          50% { background-position: 100% 50% }
-          100% { background-position: 0% 50% }
-        }
-        @keyframes bgShift3 {
-          0% { transform: translateY(0px) }
-          50% { transform: translateY(-20px) }
-          100% { transform: translateY(0px) }
-        }
-        /* animate the radial ambient layer */
-        .animate-[bgShift_16s_linear_infinite] {
-          animation: bgShift2 20s linear infinite;
-          background-size: 400% 400%;
-        }
-        /* Accessibility: reduced motion respect */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-[bgShift_16s_linear_infinite] { animation: none; }
-        }
-      `}</style>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpenIndex((i) =>
+          i === null ? null : (i + 1) % SCREENSHOTS.length
+        );
+      }}
+      className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white text-3xl font-bold select-none"
+    >
+      ›
+    </button>
+  </motion.div>
+)}
+
     </main>
   );
 }
-    

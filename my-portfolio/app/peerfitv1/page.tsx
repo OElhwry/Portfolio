@@ -1,18 +1,33 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import Image, { StaticImageData } from "next/image";
 
 import peerfitMain from "../../public/peerfitmain.png";
 import peerfitSignup from "../../public/peerfitsignup.png";
 import peerfitInterests from "../../public/peerfitinterests.png";
 import peerfitV1 from "../../public/peerfitv1.png";
+import { motion } from "framer-motion";
+
+type Screenshot = {
+  src: StaticImageData;
+  alt: string;
+  caption: string;
+};
+
+const SCREENSHOTS: Screenshot[] = [
+    { src: peerfitV1, alt: "PeerFit v1 - landing", caption: "Landing / Browse" },
+    { src: peerfitMain, alt: "PeerFit v1 - feed", caption: "Logged-in Feed" },
+    { src: peerfitSignup, alt: "PeerFit v1 - signup", caption: "Auth (Signup)" },
+    { src: peerfitInterests, alt: "PeerFit v1 - interests", caption: "Interests" },
+];
 
 export default function PeerFitV1Page() {
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [activeSection, setActiveSection] = useState("about");
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   // Track mouse for glow
   useEffect(() => {
@@ -44,6 +59,20 @@ export default function PeerFitV1Page() {
 
     return () => observer.disconnect();
   }, []);
+
+    useEffect(() => {
+      const onKey = (e: KeyboardEvent) => {
+        if (openIndex === null) return;
+        if (e.key === "Escape") setOpenIndex(null);
+        if (e.key === "ArrowLeft")
+          setOpenIndex((i) => (i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length));
+        if (e.key === "ArrowRight")
+          setOpenIndex((i) => (i === null ? null : (i + 1) % SCREENSHOTS.length));
+      };
+      window.addEventListener("keydown", onKey);
+      return () => window.removeEventListener("keydown", onKey);
+    }, [openIndex]);
+  
 
   return (
     <main className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-slate-400 antialiased selection:bg-amber-300 selection:text-slate-900">
@@ -80,6 +109,38 @@ export default function PeerFitV1Page() {
               My first attempt at creating a community fitness platform — coded
               entirely in HTML, CSS, JavaScript, and PHP, powered by XAMPP.
             </p>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mt-6 flex flex-wrap gap-2 max-w-xs"
+            >
+              {["PHP", "HTML", "CSS", "JavaScript", "XAMPP"].map((tech) => (
+                <div
+                  key={tech}
+                  className="px-3 py-1 rounded-md bg-white/5 backdrop-blur-sm border border-white/5 text-xs text-slate-100 inline-flex items-center gap-2 hover:scale-[1.05] hover:border-orange-400/30 transition"
+                >
+                  <span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{
+                      background:
+                        tech === "PHP"
+                          ? "#777bb4"
+                          : tech === "HTML"
+                          ? "#e34f26"
+                          : tech === "CSS"
+                          ? "#264de4"
+                          : tech === "JavaScript"
+                          ? "#f7df1e"
+                          : "#f97316", // XAMPP (orange)
+                    }}
+                  />
+                  <span className="font-medium">{tech}</span>
+                </div>
+              ))}
+            </motion.div>
+
 
             {/* Navigation */}
             <nav className="mt-16 hidden lg:block" aria-label="Main sections">
@@ -166,23 +227,64 @@ export default function PeerFitV1Page() {
           </section>
 
           {/* IMAGES */}
-          <section id="images" className="scroll-mt-24 space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[peerfitV1, peerfitSignup, peerfitInterests, peerfitMain].map(
-                (img, i) => (
-                  <Image
-                    key={i}
-                    src={img}
-                    alt={`PeerFit v1 screenshot ${i + 1}`}
-                    className="rounded-lg border border-slate-700 object-cover shadow-md hover:shadow-amber-500/10 transition-shadow duration-300"
-                  />
-                )
-              )}
-            </div>
-            <p className="text-sm text-slate-500 text-center">
-              *Screenshots from the original PeerFit v1 web app.*
-            </p>
-          </section>
+<motion.section
+  id="images"
+  className="scroll-mt-24"
+  initial={{ opacity: 0, y: 12 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+>
+  {/* Header */}
+  <div className="flex flex-col items-center text-center mb-10">
+    <h3 className="text-2xl font-semibold text-slate-100">PeerFit v1 Gallery</h3>
+    <p className="mt-2 text-sm text-slate-400 max-w-lg">
+      Explore the original PeerFit v1 interface — the foundation of the idea, with
+      early UI concepts for browsing, signup, and community discovery.
+    </p>
+    <div className="mt-4 h-px w-24 bg-gradient-to-r from-teal-500/40 via-teal-400/80 to-teal-500/40 rounded-full" />
+  </div>
+
+  {/* Framed Container */}
+  <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/10 hover:border-teal-400/20 transition-all duration-500">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {SCREENSHOTS.map((s, i) => (
+        <motion.button
+          key={i}
+          onClick={() => setOpenIndex(i)}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: i * 0.05 }}
+          whileHover={{ scale: 1.02 }}
+          className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:border-teal-400/30 hover:shadow-[0_0_15px_rgba(20,184,166,0.3)] transition-all duration-300"
+        >
+          {/* Image */}
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <Image
+              src={s.src}
+              alt={s.alt}
+              className="object-cover w-full h-full rounded-xl transition-transform duration-500 group-hover:scale-105"
+            />
+            {/* Overlay gradient on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300" />
+          </div>
+
+          {/* Caption below image */}
+          <div className="px-3 py-2 bg-white/5 text-left text-xs text-slate-200 font-medium border-t border-white/10">
+            {s.caption}
+          </div>
+
+          {/* Floating hover label */}
+          <div className="absolute top-3 right-3 bg-teal-400/10 text-[10px] uppercase tracking-wide px-2 py-1 rounded-full text-teal-300 font-semibold backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all">
+            View
+          </div>
+        </motion.button>
+      ))}
+    </div>
+  </div>
+</motion.section>
+
+
 
           {/* LESSONS */}
           <section id="lessons" className="space-y-4 scroll-mt-24">
@@ -256,6 +358,70 @@ export default function PeerFitV1Page() {
           z-index: 1;
         }
       `}</style>
+            {/* Lightbox Modal */}
+      {openIndex !== null && (
+        <motion.div
+          key="lightbox"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6"
+          onClick={() => setOpenIndex(null)}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
+            className="relative max-w-5xl w-full max-h-[85vh] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={SCREENSHOTS[openIndex].src}
+              alt={SCREENSHOTS[openIndex].alt}
+              className="object-contain w-full h-full bg-slate-900"
+              priority
+            />
+            <div className="absolute top-3 right-3">
+              <button
+                onClick={() => setOpenIndex(null)}
+                className="bg-white/10 hover:bg-white/20 text-white rounded-full p-2 backdrop-blur-sm"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-4 py-3 text-center text-slate-200 text-sm">
+              {SCREENSHOTS[openIndex].caption}
+            </div>
+          </motion.div>
+      
+          {/* Navigation arrows */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenIndex((i) =>
+                i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length
+              );
+            }}
+            className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white text-3xl font-bold select-none"
+          >
+            ‹
+          </button>
+      
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenIndex((i) =>
+                i === null ? null : (i + 1) % SCREENSHOTS.length
+              );
+            }}
+            className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white text-3xl font-bold select-none"
+          >
+            ›
+          </button>
+        </motion.div>
+      )}
     </main>
   );
 }
