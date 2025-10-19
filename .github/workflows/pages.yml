@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  APP_DIR: my-portfolio   # <-- change if your folder name is different
+  APP_DIR: my-portfolio   # <-- change if needed
 
 jobs:
   build:
@@ -44,16 +44,16 @@ jobs:
             npm install --no-audit --no-fund
           fi
 
-      - name: Build
+      # ⬅️ This alone produces ./out because next.config has output:"export"
+      - name: Build (static export)
         run: npm run build
 
-      - name: Static export
-        run: npx next export
-
+      # Make sure GitHub Pages serves underscored folders like _next/
       - name: Add .nojekyll to out
         run: touch out/.nojekyll
 
-      - name: Ensure CNAME copied (if kept in /public)
+      # Ensure CNAME is present (if you keep it in /public)
+      - name: Ensure CNAME copied
         run: |
           if [ -f public/CNAME ] && [ ! -f out/CNAME ]; then
             cp public/CNAME out/CNAME
@@ -62,7 +62,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.APP_DIR }}/out   # <-- artifact from subfolder
+          path: ${{ env.APP_DIR }}/out
 
   deploy:
     needs: build
