@@ -176,7 +176,7 @@ export default function PortfolioPage() {
            {/* GitHub link */}
       <div className="mt-10">
         <Link
-          href="https://github.com/your-username/explore-space"
+          href="https://github.com/OElhwry/Explore-Space"
           target="_blank"
           className="inline-block text-sm font-medium text-teal-300 hover:text-teal-200 transition"
         >

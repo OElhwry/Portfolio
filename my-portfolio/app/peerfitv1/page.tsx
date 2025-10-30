@@ -181,7 +181,7 @@ export default function PeerFitV1Page() {
           {/* GitHub link (optional if public repo) */}
           <div className="mt-10">
             <Link
-              href="https://github.com/your-username/peerfit-v1"
+              href="https://github.com/OElhwry/Peerfit"
               target="_blank"
               className="inline-block text-sm font-medium text-amber-300 hover:text-amber-200 transition"
             >

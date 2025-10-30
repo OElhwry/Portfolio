@@ -111,7 +111,7 @@ export default function PortfolioPage() {
           >
             <li>
               <a
-                href="https://github.com/"
+                href="https://github.com/OElhwry"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="GitHub"
@@ -145,7 +145,7 @@ export default function PortfolioPage() {
             </li>
             <li>
               <a
-                href="https://www.linkedin.com/"
+                href="www.linkedin.com/in/oelhawary"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="LinkedIn"

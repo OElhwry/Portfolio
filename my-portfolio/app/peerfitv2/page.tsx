@@ -189,6 +189,15 @@ if (typeof window !== "undefined") {
               </ul>
             </nav>
           </div>
+        <div className="mt-10">
+          <Link
+            href="https://github.com/OElhwry/Peerfitv2"
+            target="_blank"
+            className="inline-block text-sm font-medium text-amber-300 hover:text-amber-200 transition"
+          >
+            View on GitHub →
+          </Link>
+        </div>
         </header>
 
         {/* RIGHT PANEL */}
