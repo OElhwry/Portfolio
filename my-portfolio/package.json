@@ -5,9 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "export": "next export",
-    "build:static": "next build && next export",
-    "deploy": "npm run build:static && gh-pages -d out --nojekyll --cname oelhawary.com"
+    "build:static": "next build",
+    "deploy": "npm run build && gh-pages -d out --nojekyll --cname oelhawary.com"
   },
   "dependencies": {
     "@fontsource/fira-code": "^5.2.7",
