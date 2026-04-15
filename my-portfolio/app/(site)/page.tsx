@@ -291,7 +291,7 @@ export default function PortfolioPage() {
             </li>
             <li>
               <a
-                href="mailto:elhawary@hotmail.co.uk"
+                href="mailto:omar.elhawary@hotmail.co.uk"
                 aria-label="Email"
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm transition hover:border-sky-400/35 hover:bg-sky-950/30 hover:text-sky-300"
               >
@@ -303,7 +303,7 @@ export default function PortfolioPage() {
             </li>
             <li className="ml-auto">
               <Link
-                href="mailto:elhawary@hotmail.co.uk"
+                href="mailto:omar.elhawary@hotmail.co.uk"
                 className="group inline-flex items-center gap-2 border border-sky-500/30 bg-sky-500/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300 backdrop-blur-sm transition hover:border-sky-400/55 hover:bg-sky-500/15 hover:text-white focus-visible:outline-none"
                 style={{ borderRadius: "3px" }}
               >
@@ -494,7 +494,7 @@ export default function PortfolioPage() {
               </p>
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <Link
-                  href="mailto:elhawary@hotmail.co.uk"
+                  href="mailto:omar.elhawary@hotmail.co.uk"
                   className="group inline-flex items-center gap-3 border border-sky-500/30 bg-sky-500/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300 backdrop-blur-sm transition hover:border-sky-400/55 hover:bg-sky-500/15 hover:text-white focus-visible:outline-none"
                   style={{ borderRadius: "3px" }}
                 >
