@@ -89,7 +89,7 @@ export default function PeerFitV1Page() {
               The Beginning of the Journey
             </h2>
             <p className="mt-4 max-w-xs leading-relaxed">
-              My first attempt at creating a community fitness platform — coded
+              My first attempt at creating a community fitness platform, coded
               entirely in HTML, CSS, JavaScript, and PHP, powered by XAMPP.
             </p>
 
@@ -178,7 +178,7 @@ export default function PeerFitV1Page() {
           {/* ABOUT */}
           <section id="about" className="space-y-4 scroll-mt-24">
             <p>
-              PeerFit v1 was my first major web development project — a
+              PeerFit v1 was my first major web development project: a
               self-built fitness matching platform that connected people based
               on sport interests, skill levels, and availability. It was coded
               entirely from scratch using{" "}
@@ -197,7 +197,7 @@ export default function PeerFitV1Page() {
             <p>
               The goal was to allow users to create accounts, browse sports
               events, and connect with players in their area. I implemented
-              login systems, basic form validation, and dynamic data handling —
+              login systems, basic form validation, and dynamic data handling,
               all without any frameworks.
             </p>
             <p>
@@ -221,7 +221,7 @@ export default function PeerFitV1Page() {
   <div className="flex flex-col items-center text-center mb-10">
     <h3 className="text-2xl font-semibold text-slate-100">PeerFit v1 Gallery</h3>
     <p className="mt-2 text-sm text-slate-400 max-w-lg">
-      Explore the original PeerFit v1 interface — the foundation of the idea, with
+      Explore the original PeerFit v1 interface, the foundation of the idea, with
       early UI concepts for browsing, signup, and community discovery.
     </p>
     <div className="mt-4 h-px w-24 bg-gradient-to-r from-teal-500/40 via-teal-400/80 to-teal-500/40 rounded-full" />
@@ -320,7 +320,7 @@ export default function PeerFitV1Page() {
                 <a href="https://supabase.com/" target="_blank" rel="noreferrer">Supabase</a>
               </span>. 
               Seeing how far it evolved reminded me how every small project plays a big part in becoming a stronger developer. 
-              PeerFit v1 wasn’t just a starting point — it was the foundation that built everything after.
+              PeerFit v1 wasn’t just a starting point. It was the foundation that built everything after.
             </p>
           </section>
         </div>

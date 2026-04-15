@@ -3,151 +3,192 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { aphelionScreenshots as SCREENSHOTS } from "@/lib/project-media";
 
+// Computed once at module level so re-renders (cursor moves) never regenerate positions
+
+// Drifting layers (slow upward scroll)
+const STAR_SHADOWS_SM = Array.from({ length: 320 }, () =>
+  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(255,255,255,${(Math.random() * 0.55 + 0.3).toFixed(2)})`
+).join(",");
+const STAR_SHADOWS_MD = Array.from({ length: 130 }, () =>
+  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(200,215,255,${(Math.random() * 0.5 + 0.25).toFixed(2)})`
+).join(",");
+const STAR_SHADOWS_LG = Array.from({ length: 60 }, () =>
+  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(180,205,255,${(Math.random() * 0.4 + 0.2).toFixed(2)})`
+).join(",");
+
+// Twinkling layers — stationary, opacity-pulse at different rates
+const TWINKLE_A = Array.from({ length: 35 }, () =>
+  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(255,255,255,0.9)`
+).join(",");
+const TWINKLE_B = Array.from({ length: 35 }, () =>
+  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(210,225,255,0.85)`
+).join(",");
+const TWINKLE_C = Array.from({ length: 45 }, () =>
+  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(255,255,255,0.75)`
+).join(",");
+
+// Direction-aware slide + fade
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 36 : -36, opacity: 0, scale: 0.99 }),
+  center: { x: 0, opacity: 1, scale: 1 },
+  exit:  (dir: number) => ({ x: dir > 0 ? -36 : 36, opacity: 0, scale: 0.99 }),
+};
+const slideTransition = { duration: 0.3, ease: [0.4, 0, 0.2, 1] as const };
+
 export default function AphelionPage() {
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
+  const [cursor, setCursor]           = useState({ x: 0, y: 0 });
   const [activeSection, setActiveSection] = useState("about");
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  // Slideshow state
+  const [current, setCurrent]   = useState(0);
+  const [direction, setDirection] = useState(1);
+  const thumbsRef   = useRef<HTMLDivElement>(null);
+  const activeThumb = useRef<HTMLButtonElement>(null);
+
+  const goTo = (index: number) => {
+    setDirection(index >= current ? 1 : -1);
+    setCurrent(index);
+  };
+  const goNext = () => goTo((current + 1) % SCREENSHOTS.length);
+  const goPrev = () => goTo((current - 1 + SCREENSHOTS.length) % SCREENSHOTS.length);
+
+  // Cursor glow
   useEffect(() => {
     const move = (e: MouseEvent) => setCursor({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
 
+  // Section observer
   useEffect(() => {
     const sections = ["about", "images", "insights"];
-    sections.forEach((id) => {
-      sectionsRef.current[id] = document.getElementById(id);
-    });
-
+    sections.forEach((id) => { sectionsRef.current[id] = document.getElementById(id); });
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) setActiveSection(e.target.id); }),
       { rootMargin: "-50% 0px -50% 0px" }
     );
-
-    sections.forEach((id) => {
-      const el = sectionsRef.current[id];
-      if (el) observer.observe(el);
-    });
-
+    sections.forEach((id) => { const el = sectionsRef.current[id]; if (el) observer.observe(el); });
     return () => observer.disconnect();
   }, []);
 
+  // Keyboard nav for slideshow
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (openIndex === null) return;
-      if (e.key === "Escape") setOpenIndex(null);
-      if (e.key === "ArrowLeft") {
-        setOpenIndex((i) => (i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length));
-      }
-      if (e.key === "ArrowRight") {
-        setOpenIndex((i) => (i === null ? null : (i + 1) % SCREENSHOTS.length));
-      }
+      if (e.key === "ArrowLeft")  goPrev();
+      if (e.key === "ArrowRight") goNext();
     };
-
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [openIndex]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current]);
+
+  // Keep active thumbnail in view when navigating
+  useEffect(() => {
+    activeThumb.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [current]);
 
   return (
-    <main className="relative bg-slate-900 text-slate-400 antialiased selection:bg-teal-300 selection:text-teal-900">
+    <main
+      className="relative text-slate-400 antialiased selection:bg-indigo-500 selection:text-white"
+      style={{
+        background: `
+          radial-gradient(ellipse 90% 55% at 12% 0%, rgba(99,102,241,0.11) 0%, transparent 100%),
+          radial-gradient(ellipse 70% 45% at 88% 18%, rgba(139,92,246,0.08) 0%, transparent 100%),
+          radial-gradient(ellipse 50% 30% at 50% 100%, rgba(30,27,75,0.4) 0%, transparent 100%),
+          #080d18
+        `,
+      }}
+    >
+      {/* Back link */}
       <div className="fixed top-6 left-6 z-50">
-        <Link href="/" className="text-sm font-medium text-slate-400 transition hover:text-teal-300">
+        <Link href="/" className="text-sm font-medium text-slate-500 transition hover:text-indigo-300">
           &larr; Back to Portfolio
         </Link>
       </div>
 
+      {/* Cursor nebula glow */}
       <div
         className="pointer-events-none fixed inset-0 z-0 transition duration-300"
-        style={{
-          background: `radial-gradient(600px at ${cursor.x}px ${cursor.y}px, rgba(29,78,216,0.15), transparent 80%)`,
-        }}
+        style={{ background: `radial-gradient(600px at ${cursor.x}px ${cursor.y}px, rgba(99,102,241,0.13), transparent 80%)` }}
       />
 
+      {/* Starfield */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="stars animate-[starDrift_240s_linear_infinite]" />
+        {/* Drifting layers */}
+        <div className="stars  animate-[starDrift_240s_linear_infinite]" />
         <div className="stars2 animate-[starDrift_300s_linear_infinite]" />
         <div className="stars3 animate-[starDrift_400s_linear_infinite]" />
+        {/* Twinkling layers — stationary, pulse in opacity at different rates */}
+        <div className="twinkle-a" />
+        <div className="twinkle-b" />
+        <div className="twinkle-c" />
+        {/* Shooting stars */}
+        <div className="ss ss1" />
+        <div className="ss ss2" />
+        <div className="ss ss3" />
+        <div className="ss ss4" />
+        <div className="ss ss5" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col px-6 py-12 font-sans md:px-12 md:py-16 lg:flex-row lg:justify-between lg:gap-6 lg:py-0">
+
+        {/* ── LEFT PANEL ── */}
         <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[46%] lg:flex-col lg:justify-between lg:py-24">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">
-              <a href="/">Aphelion</a>
+            <h1
+              className="text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl"
+              style={{ textShadow: "0 0 50px rgba(129,140,248,0.28), 0 0 100px rgba(99,102,241,0.12)" }}
+            >
+              Aphelion
             </h1>
-            <h2 className="mt-3 text-lg font-mono font-medium text-slate-300 sm:text-xl">
-              Space exploration, reimagined
+            <h2 className="mt-3 text-lg font-mono font-medium text-indigo-300/80 sm:text-xl">
+              Solar system explorer
             </h2>
-            <p className="mt-4 max-w-xs leading-relaxed">
-              An immersive astronomy experience focused on planetary discovery, visual learning, and interactive quizzes.
+            <p className="mt-4 max-w-xs leading-relaxed text-slate-400">
+              A scroll-driven journey through ten worlds. From the blazing Sun to the frozen edge, 5.9 billion kilometres.
             </p>
 
+            {/* Tech badges */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className="mt-6 flex max-w-xs flex-wrap gap-2"
             >
-              {["TypeScript", "Tailwind CSS", "v0.dev", "NASA API"].map((tech) => (
+              {[
+                { name: "Next.js 14",    color: "#e2e8f0" },
+                { name: "TypeScript",    color: "#3178c6" },
+                { name: "Tailwind CSS",  color: "#06b6d4" },
+                { name: "Framer Motion", color: "#f72585" },
+              ].map((tech) => (
                 <div
-                  key={tech}
-                  className="inline-flex items-center gap-2 rounded-md border border-white/5 bg-white/5 px-3 py-1 text-xs text-slate-100 backdrop-blur-sm transition hover:scale-[1.05] hover:border-indigo-400/30"
+                  key={tech.name}
+                  className="inline-flex items-center gap-2 rounded-md border border-white/5 bg-white/5 px-3 py-1 text-xs text-slate-200 backdrop-blur-sm transition hover:scale-[1.05] hover:border-violet-400/40 hover:bg-indigo-950/40"
                 >
-                  <span
-                    className="inline-block h-2 w-2 rounded-full"
-                    style={{
-                      background:
-                        tech === "TypeScript"
-                          ? "#3178c6"
-                          : tech === "Tailwind CSS"
-                            ? "#06b6d4"
-                            : tech === "v0.dev"
-                              ? "#8b5cf6"
-                              : "#fbbf24",
-                    }}
-                  />
-                  <span className="font-medium">{tech}</span>
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: tech.color }} />
+                  <span className="font-medium">{tech.name}</span>
                 </div>
               ))}
             </motion.div>
 
-            <nav className="mt-16 hidden lg:block" aria-label="Main sections">
+            {/* Section nav */}
+            <nav className="mt-16 hidden lg:block" aria-label="Page sections">
               <ul className="space-y-2">
                 {["about", "images", "insights"].map((id) => {
-                  const label = id.charAt(0).toUpperCase() + id.slice(1);
                   const active = activeSection === id;
                   return (
                     <li key={id}>
                       <a
                         href={`#${id}`}
-                        className={`group flex items-center py-2 ${
-                          active ? "text-slate-200" : "text-slate-500"
-                        }`}
+                        className={`group flex items-center py-2 transition-colors ${active ? "text-indigo-300" : "text-slate-500"}`}
                       >
-                        <span
-                          className={`mr-4 h-px transition-all ${
-                            active
-                              ? "w-16 bg-slate-200"
-                              : "w-8 bg-slate-600 group-hover:w-16 group-hover:bg-slate-200"
-                          }`}
-                        />
-                        <span
-                          className={`text-xs font-semibold uppercase tracking-widest transition-colors ${
-                            active ? "text-slate-200" : "group-hover:text-slate-200"
-                          }`}
-                        >
-                          {label}
+                        <span className={`mr-4 h-px transition-all ${active ? "w-16 bg-indigo-400" : "w-8 bg-slate-700 group-hover:w-16 group-hover:bg-slate-400"}`} />
+                        <span className={`text-xs font-semibold uppercase tracking-widest transition-colors ${active ? "text-indigo-300" : "group-hover:text-slate-200"}`}>
+                          {id.charAt(0).toUpperCase() + id.slice(1)}
                         </span>
                       </a>
                     </li>
@@ -157,53 +198,59 @@ export default function AphelionPage() {
             </nav>
           </div>
 
-          <div className="mt-10">
+          {/* CTAs */}
+          <div className="mt-10 flex flex-col gap-3">
             <Link
-              href="https://github.com/OElhwry/Explore-Space"
+              href="https://aphelion.website"
               target="_blank"
-              className="inline-block text-sm font-medium text-teal-300 transition hover:text-teal-200"
+              rel="noreferrer"
+              className="group inline-flex items-center gap-3 self-start border border-indigo-500/30 bg-indigo-500/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-300 backdrop-blur-sm transition hover:border-indigo-400/55 hover:bg-indigo-500/18 hover:text-white"
+              style={{ borderRadius: "3px" }}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 group-hover:animate-pulse" />
+              Begin Mission
+              <span className="inline-block transition-transform group-hover:translate-x-0.5 text-indigo-500 group-hover:text-indigo-300">→</span>
+            </Link>
+            <Link
+              href="https://github.com/OElhwry/Aphelion"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block text-sm font-medium text-indigo-400/60 transition hover:text-indigo-300"
             >
               View on GitHub &rarr;
             </Link>
           </div>
         </header>
 
+        {/* ── RIGHT CONTENT ── */}
         <div className="lg:w-[54%] py-24 space-y-24">
+
+          {/* About */}
           <section id="about" className="space-y-4 scroll-mt-24">
             <p>
-              Aphelion is an interactive space app designed to make astronomy feel cinematic,
-              approachable, and genuinely fun to explore. It guides users through the solar system
-              with rich visuals, layered facts, and a more immersive sense of progression than a
-              traditional reference app.
+              Aphelion frames the solar system as a journey, not a reference. You arrive at a launch sequence, get addressed as Commander, and from the moment you click Begin Mission you&apos;re moving through the Sun&apos;s corona, past the inner planets, outward into the gas giants, and all the way to the cold edge of the system.
             </p>
             <p>
-              The experience is built around discovery. Users can move between planets, inspect
-              key information, and absorb large concepts through clear visuals rather than walls
-              of text. The goal is to turn space education into something that feels intuitive
-              and memorable.
+              Scroll pacing drives everything. Each planet appears in sequence, with its own facts, orbital data, and a set of quiz questions before you continue. Fifty questions in total, spread across ten worlds, with a{" "}
+              <span className="text-slate-200 font-medium">distance HUD</span>{" "}
+              that tracks your progress in millions of kilometres so the sense of scale stays present throughout.
             </p>
             <p>
               Built with{" "}
               <span className="text-slate-200 font-medium">
-                <a href="https://react.dev/">React</a>
+                <a href="https://nextjs.org" target="_blank" rel="noreferrer">Next.js 14</a>
               </span>
               ,{" "}
+              <span className="text-slate-200 font-medium">TypeScript</span>
+              , and{" "}
               <span className="text-slate-200 font-medium">
-                <a href="https://www.typescriptlang.org/">TypeScript</a>
-              </span>
-              ,{" "}
-              <span className="text-slate-200 font-medium">
-                <a href="https://tailwindcss.com/">Tailwind CSS</a>
+                <a href="https://www.framer.com/motion/" target="_blank" rel="noreferrer">Framer Motion</a>
               </span>{" "}
-              and prototyped with{" "}
-              <span className="text-slate-200 font-medium">
-                <a href="https://v0.app/">v0.dev</a>
-              </span>
-              , Aphelion combines polished UI work with live public space data to create a more
-              engaging learning experience.
+              for scroll-triggered animation. The quiz engine and all planetary content are authored directly, with no external API dependency, keeping the experience fast, consistent, and fully offline-capable.
             </p>
           </section>
 
+          {/* ── SLIDESHOW GALLERY ── */}
           <motion.section
             id="images"
             className="scroll-mt-24"
@@ -211,165 +258,256 @@ export default function AphelionPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <div className="mb-10 flex flex-col items-center text-center">
-              <h3 className="text-2xl font-semibold text-slate-100">Aphelion Gallery</h3>
-              <p className="mt-2 max-w-lg text-sm text-slate-400">
-                A closer look at Aphelion&apos;s planetary views, fact panels, and quiz flow.
+            {/* Header */}
+            <div className="mb-8 flex flex-col items-center text-center">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-indigo-400/50">
+                Mission Briefing
               </p>
-              <div className="mt-4 h-px w-24 rounded-full bg-gradient-to-r from-indigo-500/40 via-indigo-400/80 to-indigo-500/40" />
+              <h3 className="text-2xl font-semibold tracking-wide text-slate-100">Aphelion Gallery</h3>
+              <p className="mt-2 max-w-md text-sm text-slate-400">
+                Ten worlds. Fifty questions. 5.9 billion kilometres.
+              </p>
+              <div className="mt-4 h-px w-32 rounded-full bg-gradient-to-r from-transparent via-indigo-400/70 to-transparent" />
             </div>
 
-            <div className="relative rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg transition-all duration-500 hover:border-indigo-400/20">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {SCREENSHOTS.map((s, i) => (
-                  <motion.button
-                    key={i}
-                    onClick={() => setOpenIndex(i)}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.05 }}
-                    whileHover={{ scale: 1.02 }}
-                    className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-indigo-400/30 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+            {/* Slideshow card */}
+            <div
+              className="rounded-2xl p-4 shadow-xl sm:p-5"
+              style={{
+                background: "rgba(10,12,35,0.65)",
+                border: "1px solid rgba(99,102,241,0.15)",
+                backdropFilter: "blur(6px)",
+              }}
+            >
+              {/* ── Featured image ── */}
+              <div
+                className="relative overflow-hidden rounded-xl"
+                style={{ aspectRatio: "16/9", background: "#060a18" }}
+              >
+                <AnimatePresence initial={false} custom={direction} mode="wait">
+                  <motion.div
+                    key={current}
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={slideTransition}
+                    className="absolute inset-0"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={SCREENSHOTS[current].src}
+                      alt={SCREENSHOTS[current].alt}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                    {/* Bottom fade for caption legibility */}
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-20"
+                      style={{ background: "linear-gradient(to top, rgba(6,10,24,0.80) 0%, transparent 100%)" }}
+                    />
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Prev arrow */}
+                <button
+                  onClick={goPrev}
+                  aria-label="Previous image"
+                  className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-300 backdrop-blur-sm transition hover:text-white focus-visible:outline-none"
+                  style={{
+                    background: "rgba(8,13,36,0.55)",
+                    border: "1px solid rgba(99,102,241,0.22)",
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+
+                {/* Next arrow */}
+                <button
+                  onClick={goNext}
+                  aria-label="Next image"
+                  className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-300 backdrop-blur-sm transition hover:text-white focus-visible:outline-none"
+                  style={{
+                    background: "rgba(8,13,36,0.55)",
+                    border: "1px solid rgba(99,102,241,0.22)",
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
+
+                {/* Counter */}
+                <div
+                  className="absolute top-3 right-3 z-10 rounded px-2 py-0.5 font-mono text-[11px] text-indigo-200"
+                  style={{ background: "rgba(8,13,36,0.65)", border: "1px solid rgba(99,102,241,0.18)" }}
+                >
+                  {current + 1} / {SCREENSHOTS.length}
+                </div>
+
+                {/* Caption */}
+                <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-3 pt-6 text-center">
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={current}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-xs font-medium tracking-wide text-slate-200"
+                    >
+                      {SCREENSHOTS[current].caption}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* ── Thumbnail strip ── */}
+              <div
+                ref={thumbsRef}
+                className="mt-4 flex gap-2 overflow-x-auto pb-1"
+                style={{ scrollbarWidth: "none" }}
+              >
+                {SCREENSHOTS.map((s, i) => {
+                  const isActive = i === current;
+                  return (
+                    <button
+                      key={i}
+                      ref={isActive ? activeThumb : undefined}
+                      onClick={() => goTo(i)}
+                      aria-label={`View ${s.caption}`}
+                      className="relative flex-shrink-0 overflow-hidden rounded-lg transition-all duration-200 focus-visible:outline-none"
+                      style={{
+                        width: "76px",
+                        height: "52px",
+                        border: isActive
+                          ? "2px solid rgba(139,92,246,0.85)"
+                          : "2px solid rgba(99,102,241,0.12)",
+                        opacity: isActive ? 1 : 0.45,
+                        boxShadow: isActive ? "0 0 10px rgba(139,92,246,0.35)" : "none",
+                      }}
+                      onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.opacity = "0.75"; }}
+                      onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.opacity = "0.45"; }}
+                    >
                       <Image
                         src={s.src}
                         alt={s.alt}
-                        className="h-full w-full rounded-xl object-cover transition-transform duration-500 group-hover:scale-105"
+                        fill
+                        className="object-cover"
+                        sizes="76px"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-                    </div>
+                    </button>
+                  );
+                })}
+              </div>
 
-                    <div className="border-t border-white/10 bg-white/5 px-3 py-2 text-left text-xs font-medium text-slate-200">
-                      {s.caption}
-                    </div>
-
-                    <div className="absolute top-3 right-3 rounded-full bg-indigo-400/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-indigo-300 opacity-0 transition-all group-hover:opacity-100">
-                      View
-                    </div>
-                  </motion.button>
-                ))}
+              {/* Progress bar */}
+              <div className="mt-3 h-px w-full rounded-full" style={{ background: "rgba(99,102,241,0.12)" }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: "linear-gradient(to right, rgba(99,102,241,0.6), rgba(139,92,246,0.8))" }}
+                  animate={{ width: `${((current + 1) / SCREENSHOTS.length) * 100}%` }}
+                  transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                />
               </div>
             </div>
           </motion.section>
 
+          {/* Insights */}
           <section id="insights" aria-label="Insights" className="space-y-4 scroll-mt-24">
             <p>
-              Building Aphelion pushed the project beyond a simple space showcase and toward
-              a more complete product experience. The newer screens focus on clarity, layered
-              information, and stronger visual storytelling across exploration and quiz moments.
+              The design challenge wasn&apos;t making it look like a space app. That part is simple enough. The harder part was making it feel like a journey rather than a reference page. Scroll-triggered state, a persistent distance HUD, and a cinematic launch sequence all work toward the same goal: convincing you that you&apos;re moving through something, not just reading about it.
             </p>
             <p>
-              The updated image set also made the direction of the project much clearer:
-              less like a static demo, and more like a polished interactive learning tool.
-              That helped refine both the visual hierarchy and the pacing of the experience.
+              The quiz placement was deliberate. Questions arrive after the exploration content for each planet, not before. The intent is to let immersion do some of the teaching first, so the answers are more likely to have already landed by the time you need them.
             </p>
             <p>
-              Next steps could include account-based progress tracking, saved discoveries,
-              and more dynamic 3D interactions so the product feels even more alive over time.
+              The mission summary screen completes the arc: total score, worlds visited, distance logged. It gives the experience a proper ending rather than just stopping, which is something most educational tools skip. That finishing moment is what makes it feel like you actually went somewhere.
             </p>
           </section>
+
         </div>
       </div>
 
+      {/* Starfield CSS */}
       <style jsx global>{`
-        .stars,
-        .stars2,
-        .stars3 {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          background: transparent;
-        }
-        .stars {
-          box-shadow: ${Array(150)
-            .fill(0)
-            .map(() => `${Math.random() * 2000}px ${Math.random() * 2000}px #fff`)
-            .join(",")};
-        }
-        .stars2 {
-          box-shadow: ${Array(150)
-            .fill(0)
-            .map(() => `${Math.random() * 2000}px ${Math.random() * 2000}px #ccc`)
-            .join(",")};
-          animation: starDrift 300s linear infinite;
-        }
-        .stars3 {
-          box-shadow: ${Array(150)
-            .fill(0)
-            .map(() => `${Math.random() * 2000}px ${Math.random() * 2000}px #999`)
-            .join(",")};
-          animation: starDrift 400s linear infinite;
-        }
+        /* ── Drifting star layers ── */
+        .stars, .stars2, .stars3 { position: absolute; background: transparent; }
+        .stars  { width: 1px; height: 1px; box-shadow: ${STAR_SHADOWS_SM}; }
+        .stars2 { width: 2px; height: 2px; box-shadow: ${STAR_SHADOWS_MD}; }
+        .stars3 { width: 3px; height: 3px; box-shadow: ${STAR_SHADOWS_LG}; }
+
         @keyframes starDrift {
-          from {
-            transform: translateY(0);
-          }
-          to {
-            transform: translateY(-1000px);
-          }
+          from { transform: translateY(0); }
+          to   { transform: translateY(-1000px); }
         }
+
+        /* ── Twinkling layers (stationary, opacity pulse) ── */
+        .twinkle-a, .twinkle-b, .twinkle-c { position: absolute; background: transparent; }
+        .twinkle-a { width: 2px; height: 2px; box-shadow: ${TWINKLE_A}; animation: twinkle 2.8s ease-in-out 0.0s infinite alternate; }
+        .twinkle-b { width: 2px; height: 2px; box-shadow: ${TWINKLE_B}; animation: twinkle 3.6s ease-in-out 0.9s infinite alternate; }
+        .twinkle-c { width: 1px; height: 1px; box-shadow: ${TWINKLE_C}; animation: twinkle 4.3s ease-in-out 1.8s infinite alternate; }
+
+        @keyframes twinkle {
+          from { opacity: 0.1; }
+          to   { opacity: 1.0; }
+        }
+
+        /* ── Shooting stars ── */
+        .ss {
+          position: absolute;
+          border-radius: 999px;
+          opacity: 0;
+          pointer-events: none;
+          background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(148, 180, 255, 0.5) 35%,
+            rgba(210, 228, 255, 0.92) 70%,
+            rgba(255, 255, 255, 1) 100%
+          );
+        }
+
+        @keyframes shoot1 {
+          0%    { opacity: 0; transform: rotate(25deg) translateX(0); }
+          4%    { opacity: 0.85; }
+          18%   { opacity: 0; transform: rotate(25deg) translateX(480px); }
+          100%  { opacity: 0; transform: rotate(25deg) translateX(480px); }
+        }
+        @keyframes shoot2 {
+          0%    { opacity: 0; transform: rotate(20deg) translateX(0); }
+          5%    { opacity: 0.70; }
+          22%   { opacity: 0; transform: rotate(20deg) translateX(580px); }
+          100%  { opacity: 0; transform: rotate(20deg) translateX(580px); }
+        }
+        @keyframes shoot3 {
+          0%    { opacity: 0; transform: rotate(32deg) translateX(0); }
+          3.5%  { opacity: 0.92; }
+          15%   { opacity: 0; transform: rotate(32deg) translateX(400px); }
+          100%  { opacity: 0; transform: rotate(32deg) translateX(400px); }
+        }
+        @keyframes shoot4 {
+          0%    { opacity: 0; transform: rotate(18deg) translateX(0); }
+          4.5%  { opacity: 0.75; }
+          20%   { opacity: 0; transform: rotate(18deg) translateX(520px); }
+          100%  { opacity: 0; transform: rotate(18deg) translateX(520px); }
+        }
+        @keyframes shoot5 {
+          0%    { opacity: 0; transform: rotate(28deg) translateX(0); }
+          3.5%  { opacity: 0.82; }
+          17%   { opacity: 0; transform: rotate(28deg) translateX(440px); }
+          100%  { opacity: 0; transform: rotate(28deg) translateX(440px); }
+        }
+
+        /* Each star: different position, size, speed, and delay for natural spacing */
+        .ss1 { top: 9%;  left: 8%;   width: 130px; height: 1.5px; animation: shoot1  9s ease-in  3s  infinite; }
+        .ss2 { top: 22%; left: 52%;  width: 100px; height: 1px;   animation: shoot2 12s ease-in  14s infinite; }
+        .ss3 { top: 4%;  left: -4%;  width: 165px; height: 2px;   animation: shoot3  7s ease-in  26s infinite; }
+        .ss4 { top: 38%; left: 22%;  width: 90px;  height: 1px;   animation: shoot4 14s ease-in  40s infinite; }
+        .ss5 { top: 14%; left: 70%;  width: 118px; height: 1.5px; animation: shoot5  8s ease-in  55s infinite; }
       `}</style>
-
-      {openIndex !== null && (
-        <motion.div
-          key="lightbox"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 backdrop-blur-sm"
-          onClick={() => setOpenIndex(null)}
-        >
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            className="relative max-h-[85vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={SCREENSHOTS[openIndex].src}
-              alt={SCREENSHOTS[openIndex].alt}
-              className="h-full w-full bg-slate-900 object-contain"
-              priority
-            />
-            <div className="absolute top-3 right-3">
-              <button
-                onClick={() => setOpenIndex(null)}
-                className="rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
-                aria-label="Close"
-              >
-                &times;
-              </button>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-4 py-3 text-center text-sm text-slate-200">
-              {SCREENSHOTS[openIndex].caption}
-            </div>
-          </motion.div>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpenIndex((i) => (i === null ? null : (i - 1 + SCREENSHOTS.length) % SCREENSHOTS.length));
-            }}
-            className="absolute left-6 top-1/2 -translate-y-1/2 select-none text-3xl font-bold text-slate-300 hover:text-white"
-          >
-            &lsaquo;
-          </button>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpenIndex((i) => (i === null ? null : (i + 1) % SCREENSHOTS.length));
-            }}
-            className="absolute right-6 top-1/2 -translate-y-1/2 select-none text-3xl font-bold text-slate-300 hover:text-white"
-          >
-            &rsaquo;
-          </button>
-        </motion.div>
-      )}
     </main>
   );
 }

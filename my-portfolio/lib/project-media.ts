@@ -7,10 +7,23 @@ import aphelionQuizCorrectAnswer from "@/public/images/projects/Aphelion/Aphelio
 import aphelionQuizOverview from "@/public/images/projects/Aphelion/AphelionQuizOverview.png";
 import aphelionSolarSystemView from "@/public/images/projects/Aphelion/AphelionSolarSystemView.png";
 import aphelionSunPlanetView from "@/public/images/projects/Aphelion/AphelionSunPlanetViewAndFacts.png";
+import deadcenterMainMenu from "@/public/images/projects/deadcenter/DeadcenterMainMenu.png";
+import deadcenterScoring from "@/public/images/projects/deadcenter/DeadcenterScoring.png";
+import deadcenterLevelDesigns from "@/public/images/projects/deadcenter/deadcenterInterestingLevelDesigns.png";
+import deadcenterLevelsSelected from "@/public/images/projects/deadcenter/deadcenterMainMenuWithLevelsSelected.png";
+import deadcenterSettings from "@/public/images/projects/deadcenter/deadcentersettings.png";
+import deadcenterWarmup from "@/public/images/projects/deadcenter/deadcenterwarmup.png";
+import kvitHome from "@/public/images/projects/Kvit/kvitHome.png";
+import kvitManualPercent from "@/public/images/projects/Kvit/KvitManualPercenShowcaseWithValues.png";
+import kvitShareResult from "@/public/images/projects/Kvit/KvitImageShareResult.png";
 import peerfitV1Feed from "@/public/images/projects/peerfit-v1/feed.png";
 import peerfitV1Interests from "@/public/images/projects/peerfit-v1/interests.png";
 import peerfitV1Landing from "@/public/images/projects/peerfit-v1/landing.png";
 import peerfitV1Signup from "@/public/images/projects/peerfit-v1/signup.png";
+import peerfitV2Home2 from "@/public/images/projects/peerfit-v2/peerfithome2.png";
+import peerfitV2Home3 from "@/public/images/projects/peerfit-v2/peerfithome3.png";
+import peerfitV2Home4 from "@/public/images/projects/peerfit-v2/peerfithome4.png";
+import peerfitV2Home5 from "@/public/images/projects/peerfit-v2/peerfithome5.png";
 import peerfitV2ActivitiesCalendar from "@/public/images/projects/peerfit-v2/PeerfitActivitiesCalender.png";
 import peerfitV2EditProfile from "@/public/images/projects/peerfit-v2/PeerfitEditProfile.png";
 import peerfitV2Feed from "@/public/images/projects/peerfit-v2/PeerfitFeed.png";
@@ -37,6 +50,8 @@ export type Screenshot = {
 
 export const projectPreviews = {
   aphelion: aphelionHome,
+  deadcenter: deadcenterMainMenu,
+  kvit: kvitManualPercent,
   peerfitV1: peerfitV1Landing,
   peerfitV1Signup,
   peerfitV2: peerfitV2Home,
@@ -53,7 +68,11 @@ export const peerfitV1Screenshots: Screenshot[] = [
 ];
 
 export const peerfitV2Screenshots: Screenshot[] = [
-  { src: peerfitV2Home, alt: "PeerFit v2 - home", caption: "Home Feed" },
+  { src: peerfitV2Home,  alt: "PeerFit v2 - home",   caption: "Homepage"            },
+  { src: peerfitV2Home2, alt: "PeerFit v2 - home 2", caption: "Homepage — Features"  },
+  { src: peerfitV2Home3, alt: "PeerFit v2 - home 3", caption: "Homepage — Discovery" },
+  { src: peerfitV2Home4, alt: "PeerFit v2 - home 4", caption: "Homepage — Community" },
+  { src: peerfitV2Home5, alt: "PeerFit v2 - home 5", caption: "Homepage — Get Started"},
   { src: peerfitV2Feed, alt: "PeerFit v2 - feed", caption: "Activity Feed" },
   { src: peerfitV2FeedCards, alt: "PeerFit v2 - feed cards", caption: "Feed Cards" },
   { src: peerfitV2FeedFilters, alt: "PeerFit v2 - filters", caption: "Filters" },
@@ -70,6 +89,21 @@ export const peerfitV2Screenshots: Screenshot[] = [
   { src: peerfitV2EditProfile, alt: "PeerFit v2 - edit profile", caption: "Edit Profile" },
   { src: peerfitV2Settings, alt: "PeerFit v2 - settings", caption: "Settings" },
   { src: peerfitV2SettingsAlt, alt: "PeerFit v2 - settings details", caption: "Settings Details" },
+];
+
+export const deadcenterScreenshots: Screenshot[] = [
+  { src: deadcenterMainMenu, alt: "Deadcenter - main menu", caption: "Main Menu" },
+  { src: deadcenterLevelsSelected, alt: "Deadcenter - level select", caption: "Level Select" },
+  { src: deadcenterWarmup, alt: "Deadcenter - warmup level", caption: "Warmup Level" },
+  { src: deadcenterLevelDesigns, alt: "Deadcenter - level designs", caption: "Level Design Variety" },
+  { src: deadcenterScoring, alt: "Deadcenter - scoring", caption: "Scoring System" },
+  { src: deadcenterSettings, alt: "Deadcenter - settings", caption: "Settings" },
+];
+
+export const kvitScreenshots: Screenshot[] = [
+  { src: kvitHome, alt: "Kvit - home", caption: "Home" },
+  { src: kvitManualPercent, alt: "Kvit - custom percentage split", caption: "Custom Percentage Split" },
+  { src: kvitShareResult, alt: "Kvit - share result", caption: "Share Result" },
 ];
 
 export const aphelionScreenshots: Screenshot[] = [
