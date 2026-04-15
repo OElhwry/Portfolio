@@ -69,23 +69,31 @@ const PROJECTS = [
   },
 ];
 
-const TECH_BADGES = [
-  { name: "React",      color: "#61dafb" },
-  { name: "Next.js",    color: "#ffffff" },
-  { name: "TypeScript", color: "#3178c6" },
-  { name: "Tailwind",   color: "#06b6d4" },
-  { name: "Supabase",   color: "#3ecf8e" },
-  { name: "Node.js",    color: "#84cc16" },
-  { name: "Framer",     color: "#f472b6" },
-  { name: "Figma",      color: "#a78bfa" },
-];
+const NOISE_SVG =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")";
+
+const EMAIL = "omar.elhawary@hotmail.co.uk";
 
 export default function PortfolioPage() {
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [activeSection, setActiveSection] = useState("about");
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
+  const [copied, setCopied] = useState(false);
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText(EMAIL).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   useEffect(() => {
+    // Skip the cursor-glow listener on touch devices and when reduced motion is preferred
+    if (typeof window === "undefined") return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    if (reduced || coarse) return;
+
     const move = (e: MouseEvent) => setCursor({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
@@ -118,33 +126,98 @@ export default function PortfolioPage() {
     <main
       className="relative text-slate-400 antialiased selection:bg-sky-300 selection:text-slate-900"
       style={{
-        background: `
-          radial-gradient(ellipse 80% 55% at 50% -8%,  rgba(56,189,248,0.13)  0%, transparent 100%),
-          radial-gradient(ellipse 55% 45% at 95% 72%,  rgba(99,102,241,0.09)  0%, transparent 100%),
-          radial-gradient(ellipse 45% 40% at 5%  65%,  rgba(56,189,248,0.06)  0%, transparent 100%),
-          #0b1120
-        `,
+        background: "#070a12",
       }}
     >
-      {/* Grid pattern overlay */}
+      {/* Aurora orbs — indigo/violet, distinct from project pages */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
-          backgroundImage: `
-            linear-gradient(rgba(56,189,248,0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(56,189,248,0.035) 1px, transparent 1px)
+          background: `
+            radial-gradient(60% 45% at 85% 8%, rgba(129,140,248,0.16) 0%, transparent 70%),
+            radial-gradient(50% 40% at 8% 92%, rgba(14,165,233,0.10) 0%, transparent 70%),
+            radial-gradient(40% 35% at 50% 50%, rgba(167,139,250,0.05) 0%, transparent 80%)
           `,
-          backgroundSize: "56px 56px",
         }}
       />
 
-      {/* Cursor glow */}
+      {/* Fine dot field (replaces the grid) */}
       <div
-        className="pointer-events-none fixed inset-0 z-0 transition duration-300"
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.55]"
         style={{
-          background: `radial-gradient(600px at ${cursor.x}px ${cursor.y}px, rgba(56,189,248,0.10), transparent 80%)`,
+          backgroundImage:
+            "radial-gradient(rgba(148,163,184,0.22) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+          maskImage:
+            "radial-gradient(ellipse 90% 70% at 50% 40%, #000 50%, transparent 100%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 90% 70% at 50% 40%, #000 50%, transparent 100%)",
         }}
       />
+
+      {/* Film grain */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.06] mix-blend-overlay"
+        style={{ backgroundImage: NOISE_SVG, backgroundSize: "240px 240px" }}
+      />
+
+      {/* Soft spotlight that follows the cursor */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 transition duration-500"
+        style={{
+          background: `radial-gradient(520px at ${cursor.x}px ${cursor.y}px, rgba(165,180,252,0.07), transparent 75%)`,
+        }}
+      />
+
+      {/* Vignette to anchor the page */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 120% 80% at 50% 50%, transparent 55%, rgba(3,6,14,0.7) 100%)",
+        }}
+      />
+
+      {/* Mobile sticky section nav — hidden on desktop (left panel handles it there) */}
+      <nav
+        aria-label="Section navigation"
+        className="sticky top-0 z-40 lg:hidden"
+        style={{
+          background: "rgba(7,10,18,0.82)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid rgba(129,140,248,0.14)",
+        }}
+      >
+        <ul className="mx-auto flex max-w-screen-xl items-center justify-center gap-1 px-6 py-2.5">
+          {["about", "experience", "projects"].map((id) => {
+            const active = activeSection === id;
+            return (
+              <li key={id}>
+                <a
+                  href={`#${id}`}
+                  className={`inline-flex items-center rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
+                    active
+                      ? "text-indigo-200"
+                      : "text-slate-500 hover:text-slate-200"
+                  }`}
+                  style={
+                    active
+                      ? {
+                          background: "rgba(129,140,248,0.12)",
+                          border: "1px solid rgba(129,140,248,0.32)",
+                        }
+                      : {
+                          border: "1px solid transparent",
+                        }
+                  }
+                >
+                  {id}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col px-6 py-12 font-sans md:px-12 md:py-16 lg:flex-row lg:justify-between lg:gap-6 lg:py-0">
 
@@ -160,7 +233,7 @@ export default function PortfolioPage() {
             <h1
               className="text-4xl font-bold tracking-tight sm:text-5xl"
               style={{
-                background: "linear-gradient(135deg, #f1f5f9 0%, #bae6fd 55%, #7dd3fc 100%)",
+                background: "linear-gradient(135deg, #f1f5f9 0%, #c7d2fe 55%, #a5b4fc 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -168,20 +241,21 @@ export default function PortfolioPage() {
             >
               <a href="/">Omar El Hawary</a>
             </h1>
-            <div className="mt-2 h-px w-16 bg-gradient-to-r from-sky-400/70 to-transparent" />
+            <div className="mt-2 h-px w-16 bg-gradient-to-r from-indigo-400/70 to-transparent" />
 
-            <h2 className="mt-4 text-lg font-mono font-medium text-sky-300/80 sm:text-xl">
-              Front End Developer
+            <h2 className="mt-4 text-lg font-mono font-medium text-indigo-200/80 sm:text-xl">
+              Software Developer
             </h2>
 
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-400">
-              I build fast, interactive web products that feel as good to use as they look.
-              Focused on the space where <span className="font-medium text-slate-200">design</span> meets{" "}
-              <span className="font-medium text-slate-200">engineering</span>.
+              I build digital products with a sharp eye for{" "}
+              <span className="font-medium text-slate-200">usability</span>,{" "}
+              <span className="font-medium text-slate-200">polish</span>, and the small
+              interactions that make software feel alive.
             </p>
 
             {/* Status + stat pills */}
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               <span
                 className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium text-emerald-300"
                 style={{
@@ -195,37 +269,19 @@ export default function PortfolioPage() {
                 </span>
                 Available for work
               </span>
-              {["London / Remote", "Front-end · Full-stack"].map((stat) => (
+              {["London / Remote", "Junior – Mid-level"].map((stat) => (
                 <span
                   key={stat}
-                  className="rounded-full px-3 py-1 text-[11px] font-medium text-sky-300/75"
+                  className="rounded-full px-3 py-1 text-[11px] font-medium text-indigo-200/80"
                   style={{
-                    border: "1px solid rgba(56,189,248,0.18)",
-                    background: "rgba(56,189,248,0.06)",
+                    border: "1px solid rgba(129,140,248,0.22)",
+                    background: "rgba(129,140,248,0.06)",
                   }}
                 >
                   {stat}
                 </span>
               ))}
             </div>
-
-            {/* Tech badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mt-4 flex max-w-xs flex-wrap gap-2"
-            >
-              {TECH_BADGES.map((tech) => (
-                <div
-                  key={tech.name}
-                  className="inline-flex items-center gap-2 rounded-md border border-white/5 bg-white/5 px-3 py-1 text-xs text-slate-200 backdrop-blur-sm transition hover:scale-[1.05] hover:border-sky-400/35 hover:bg-sky-950/30"
-                >
-                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: tech.color }} />
-                  <span className="font-medium">{tech.name}</span>
-                </div>
-              ))}
-            </motion.div>
 
             {/* Section nav */}
             <nav className="mt-6 hidden lg:block" aria-label="Main sections">
@@ -289,15 +345,45 @@ export default function PortfolioPage() {
                 </svg>
               </a>
             </li>
+            <li className="relative">
+              <button
+                onClick={copyEmail}
+                aria-label={copied ? "Copied!" : "Copy email address"}
+                title={copied ? "Copied!" : EMAIL}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm transition hover:border-indigo-400/35 hover:bg-indigo-950/30 hover:text-indigo-300"
+              >
+                {copied ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-emerald-400">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m22 7-10 6L2 7" />
+                  </svg>
+                )}
+              </button>
+              {copied && (
+                <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-800 px-2 py-1 text-[10px] font-medium text-emerald-300 shadow">
+                  Copied!
+                </span>
+              )}
+            </li>
             <li>
+              {/* CV download — replace href with your CV file (e.g. "/omar-elhawary-cv.pdf" once placed in /public) */}
               <a
-                href="mailto:omar.elhawary@hotmail.co.uk"
-                aria-label="Email"
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm transition hover:border-sky-400/35 hover:bg-sky-950/30 hover:text-sky-300"
+                href="/cv.pdf"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Download CV"
+                title="Download CV"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm transition hover:border-indigo-400/35 hover:bg-indigo-950/30 hover:text-indigo-300"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-                  <rect x="2" y="4" width="20" height="16" rx="2" />
-                  <path d="m22 7-10 6L2 7" />
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="12" y1="18" x2="12" y2="12" />
+                  <polyline points="9 15 12 18 15 15" />
                 </svg>
               </a>
             </li>
@@ -320,34 +406,34 @@ export default function PortfolioPage() {
           {/* ── ABOUT ── */}
           <section id="about" className="scroll-mt-24 space-y-5">
             <p className="leading-relaxed text-slate-300">
-              Hi, I&apos;m Omar — a London-based developer who builds web products that feel as good to use
-              as they look. My work sits at the intersection of design and engineering: thoughtful
-              interfaces, snappy interactions, and the kind of small details users notice but rarely
-              mention.
+              I&apos;m Omar, a London-based developer building digital products with a strong
+              focus on <span className="font-medium text-slate-200">usability</span>,{" "}
+              <span className="font-medium text-slate-200">polish</span>, and the interaction
+              details that make software feel considered rather than assembled.
             </p>
             <p className="leading-relaxed">
               I studied{" "}
               <span className="font-medium text-slate-200">
-                <a href="https://www.qmul.ac.uk/undergraduate/course-info/computer-science" target="_blank" rel="noreferrer" className="transition-colors hover:text-sky-300">Computer Science</a>
+                <a href="https://www.qmul.ac.uk/undergraduate/course-info/computer-science" target="_blank" rel="noreferrer" className="transition-colors hover:text-indigo-300">Computer Science</a>
               </span>{" "}
               at{" "}
               <span className="font-medium text-slate-200">
-                <a href="https://www.qmul.ac.uk" target="_blank" rel="noreferrer" className="transition-colors hover:text-sky-300">Queen Mary University of London</a>
+                <a href="https://www.qmul.ac.uk" target="_blank" rel="noreferrer" className="transition-colors hover:text-indigo-300">Queen Mary University of London</a>
               </span>
-              , where I picked up the fundamentals in algorithms, systems, and software design. What
-              really clicked for me was front-end work. The immediacy of shipping something people can
-              click, break, and actually use turned a degree into a craft I wanted to keep getting
-              better at.
+              , where the fundamentals clicked across algorithms, systems, and software design.
+              Front-end is what grabbed me first — the speed of shipping something people can
+              actually touch — but I&apos;m just as interested in the wider craft of building
+              software.
             </p>
             <p className="leading-relaxed">
-              I&apos;m currently looking for a role where I can grow as a{" "}
-              <span className="font-medium text-slate-200">front-end or full-stack developer</span>,
-              work on products with real users, and learn from a team that cares about its craft. Open
-              to junior and mid-level positions, in London or remote.
+              I&apos;m looking for <span className="font-medium text-slate-200">junior to mid-level</span>{" "}
+              opportunities in London or remote. Front-end and full-stack roles are the obvious
+              fit, but I&apos;m open to anything across software and computing where I can keep
+              levelling up alongside a team that cares about its work.
             </p>
             <p className="leading-relaxed">
-              Outside of code you&apos;ll usually find me at the gym training calisthenics, playing
-              tennis and padel, or getting steadily worse at chess. This portfolio is one of my
+              Away from the screen I&apos;m usually training calisthenics, playing tennis or padel,
+              or losing at chess in increasingly creative ways. This portfolio is one of my
               favourite side projects, so feel free to poke around.
             </p>
           </section>
@@ -377,9 +463,9 @@ export default function PortfolioPage() {
                       Box Office Assistant · Winter Wonderland
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed">
-                      Front-line customer support for one of London&apos;s busiest seasonal attractions.
-                      Handled ticket queries, resolved issues on the spot, and kept guests moving through
-                      the gates during peak demand.
+                      Front-line support at one of London&apos;s busiest seasonal attractions.
+                      Thought on my feet to solve ticketing issues, calmed frustrated guests, and
+                      kept thousands of people moving through the gates without the queue breaking down.
                     </p>
                   </div>
                 </a>
@@ -401,9 +487,10 @@ export default function PortfolioPage() {
                       Call Handler · NHS Test &amp; Trace
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed">
-                      Supported the UK&apos;s COVID-19 response with clear, empathetic communication.
-                      Resolved public queries under pressure and learned how much the right words matter
-                      when people are anxious.
+                      Handled a high volume of public calls during the UK&apos;s COVID-19 response.
+                      Worked through unclear situations with structured questioning, clear
+                      explanations, and the patience to talk anxious people through the answer
+                      they actually needed.
                     </p>
                   </div>
                 </a>
@@ -489,8 +576,8 @@ export default function PortfolioPage() {
               </p>
               <h3 className="text-xl font-semibold text-slate-100">Open to new opportunities</h3>
               <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
-                Got a role, project, or just want to chat about front-end work? The inbox is open
-                and I reply to every message.
+                Got a role, a project, or just want to trade notes on building software? The
+                inbox is open and I reply to every message.
               </p>
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <Link
@@ -508,7 +595,7 @@ export default function PortfolioPage() {
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition hover:text-sky-300"
                 >
-                  Connect on LinkedIn &rarr;
+                  LinkedIn &rarr;
                 </Link>
               </div>
             </div>

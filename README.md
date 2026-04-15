@@ -19,10 +19,6 @@ You’ll find:
 ---
 
 ## Inspiration
-
-This portfolio draws design inspiration from [Brittany Chiang](https://v4.brittanychiang.com/), whose portfolio layout and user experience really stood out to me.  
-I admired her focus on subtle motion, structured typography, and minimalist design, and decided to recreate a similar layout while giving it my own style and content.
-
 I’ve rewritten the components, adjusted the structure, and customized every section to reflect **my personal brand, projects, and technical stack**.  
 All styling, animations, and configurations were rebuilt independently in **Next.js 14 (App Router)** with full **TypeScript** support.
 
