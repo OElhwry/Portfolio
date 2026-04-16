@@ -213,7 +213,7 @@ export default function PortfolioPage() {
         </ul>
       </nav>
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col px-6 py-12 font-sans md:px-12 md:py-16 lg:flex-row lg:justify-between lg:gap-6 lg:py-0">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col px-5 pt-8 pb-10 font-sans sm:px-6 sm:pt-10 md:px-12 md:pt-14 md:pb-16 lg:flex-row lg:justify-between lg:gap-6 lg:py-0">
 
         {/* ── LEFT PANEL ── */}
         <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[46%] lg:flex-col lg:justify-between lg:py-16">
@@ -312,7 +312,7 @@ export default function PortfolioPage() {
           </div>
 
           {/* Social Links */}
-          <ul className="mt-8 flex items-center gap-4" aria-label="Social links">
+          <ul className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4" aria-label="Social links">
             <li>
               <a
                 href="https://github.com/OElhwry"
@@ -381,10 +381,10 @@ export default function PortfolioPage() {
                 </svg>
               </a>
             </li>
-            <li className="ml-auto">
+            <li className="order-last w-full sm:order-none sm:ml-auto sm:w-auto">
               <Link
                 href="mailto:omar.elhawary@hotmail.co.uk"
-                className="group inline-flex items-center gap-2 border border-sky-500/30 bg-sky-500/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300 backdrop-blur-sm transition hover:border-sky-400/55 hover:bg-sky-500/15 hover:text-white focus-visible:outline-none"
+                className="group inline-flex w-full items-center justify-center gap-2 border border-sky-500/30 bg-sky-500/10 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300 backdrop-blur-sm transition hover:border-sky-400/55 hover:bg-sky-500/15 hover:text-white focus-visible:outline-none sm:w-auto sm:py-2"
                 style={{ borderRadius: "3px" }}
               >
                 Get in touch
@@ -395,7 +395,7 @@ export default function PortfolioPage() {
         </header>
 
         {/* ── RIGHT CONTENT ── */}
-        <div className="space-y-24 py-24 lg:w-[54%]">
+        <div className="space-y-16 pt-10 pb-14 md:space-y-20 md:pt-12 md:pb-20 lg:space-y-24 lg:py-24 lg:w-[54%]">
 
           {/* ── ABOUT ── */}
           <section id="about" className="scroll-mt-24 space-y-5">
