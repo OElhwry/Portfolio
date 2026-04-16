@@ -12,7 +12,7 @@
     "@fortawesome/fontawesome-free": "^7.1.0",
     "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.23.24",
-    "next": "15.5.5",
+    "next": "15.5.9",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
