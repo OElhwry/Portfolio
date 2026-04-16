@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { projectPreviews } from "@/lib/project-media";
+import ProjectThumbnail from "@/components/ProjectThumbnail";
 
 const PROJECTS = [
   {
@@ -14,8 +13,7 @@ const PROJECTS = [
     description:
       "A social sports platform where users discover local sessions, match by skill level, and build a profile with stats, badges, and peer reviews. Full production rebuild with Next.js 15, Supabase auth, SSR sessions, and light/dark theming. Live at peerfit.co.uk.",
     tags: ["Next.js 15", "TypeScript", "Supabase", "Tailwind 4"],
-    preview: "peerfitV2" as const,
-    previewAlt: "PeerFit v2 preview",
+    thumbnail: "peerfitV2" as const,
     accentHover: "group-hover:text-teal-300",
     tagColor: "bg-teal-400/10 text-teal-300 border border-teal-400/20",
   },
@@ -26,8 +24,7 @@ const PROJECTS = [
     description:
       "A precision reaction game with one rule: stop the dot. Twenty hand-designed levels across four difficulty tiers layer in bounces, orbits, and near-chaotic movement to keep a single mechanic endlessly engaging.",
     tags: ["React 19", "JavaScript", "Vite 8", "Web Audio API"],
-    preview: "deadcenter" as const,
-    previewAlt: "Deadcenter preview",
+    thumbnail: "deadcenter" as const,
     accentHover: "group-hover:text-orange-300",
     tagColor: "bg-orange-400/10 text-orange-300 border border-orange-400/20",
   },
@@ -38,8 +35,7 @@ const PROJECTS = [
     description:
       "A zero-friction bill splitter built for the moment the waiter brings the card machine. Enter who spent what, pick equal or custom splits, and it calculates the smallest set of transfers to settle up. Works offline, no sign-up.",
     tags: ["React 19", "Vite", "Lucide React", "html2canvas"],
-    preview: "kvit" as const,
-    previewAlt: "Kvit preview",
+    thumbnail: "kvit" as const,
     accentHover: "group-hover:text-emerald-300",
     tagColor: "bg-emerald-400/10 text-emerald-300 border border-emerald-400/20",
   },
@@ -50,8 +46,7 @@ const PROJECTS = [
     description:
       "An interactive space app that turns planetary exploration into something cinematic. Surfaces Mars imagery, solar system data, and planetary facts in a clean, visual-first interface, with an integrated quiz to test what you have learned.",
     tags: ["Next.js 14", "TypeScript", "Tailwind CSS", "Framer Motion"],
-    preview: "aphelion" as const,
-    previewAlt: "Aphelion preview",
+    thumbnail: "aphelion" as const,
     accentHover: "group-hover:text-sky-300",
     tagColor: "bg-sky-400/10 text-sky-300 border border-sky-400/20",
   },
@@ -62,8 +57,7 @@ const PROJECTS = [
     description:
       "The original version of PeerFit, built with PHP and MySQL on XAMPP. It proved the concept (accounts, activity posts, basic matching) and became the foundation the v2 React rebuild was designed to outgrow.",
     tags: ["PHP", "MySQL", "JavaScript", "XAMPP"],
-    preview: "peerfitV1" as const,
-    previewAlt: "PeerFit v1 preview",
+    thumbnail: "peerfitV1" as const,
     accentHover: "group-hover:text-amber-300",
     tagColor: "bg-amber-400/10 text-amber-300 border border-amber-400/20",
   },
@@ -518,12 +512,8 @@ export default function PortfolioPage() {
 
                     {/* Thumbnail */}
                     <div className="relative z-10 sm:order-1 sm:col-span-2">
-                      <div className="relative overflow-hidden rounded-lg border-2 border-slate-200/10 transition group-hover:border-sky-400/35">
-                        <Image
-                          src={projectPreviews[project.preview]}
-                          alt={project.previewAlt}
-                          className="aspect-video w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                        />
+                      <div className="transition group-hover:scale-[1.04] duration-500">
+                        <ProjectThumbnail project={project.thumbnail} />
                       </div>
                     </div>
 

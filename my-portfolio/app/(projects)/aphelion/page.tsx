@@ -6,28 +6,37 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { aphelionScreenshots as SCREENSHOTS } from "@/lib/project-media";
 
-// Computed once at module level so re-renders (cursor moves) never regenerate positions
+// Seeded PRNG so server and client produce identical star positions (fixes hydration mismatch)
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rand = mulberry32(42);
 
 // Drifting layers (slow upward scroll)
 const STAR_SHADOWS_SM = Array.from({ length: 320 }, () =>
-  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(255,255,255,${(Math.random() * 0.55 + 0.3).toFixed(2)})`
+  `${(rand() * 2000).toFixed(0)}px ${(rand() * 2000).toFixed(0)}px rgba(255,255,255,${(rand() * 0.55 + 0.3).toFixed(2)})`
 ).join(",");
 const STAR_SHADOWS_MD = Array.from({ length: 130 }, () =>
-  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(200,215,255,${(Math.random() * 0.5 + 0.25).toFixed(2)})`
+  `${(rand() * 2000).toFixed(0)}px ${(rand() * 2000).toFixed(0)}px rgba(200,215,255,${(rand() * 0.5 + 0.25).toFixed(2)})`
 ).join(",");
 const STAR_SHADOWS_LG = Array.from({ length: 60 }, () =>
-  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(180,205,255,${(Math.random() * 0.4 + 0.2).toFixed(2)})`
+  `${(rand() * 2000).toFixed(0)}px ${(rand() * 2000).toFixed(0)}px rgba(180,205,255,${(rand() * 0.4 + 0.2).toFixed(2)})`
 ).join(",");
 
 // Twinkling layers — stationary, opacity-pulse at different rates
 const TWINKLE_A = Array.from({ length: 35 }, () =>
-  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(255,255,255,0.9)`
+  `${(rand() * 2000).toFixed(0)}px ${(rand() * 2000).toFixed(0)}px rgba(255,255,255,0.9)`
 ).join(",");
 const TWINKLE_B = Array.from({ length: 35 }, () =>
-  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(210,225,255,0.85)`
+  `${(rand() * 2000).toFixed(0)}px ${(rand() * 2000).toFixed(0)}px rgba(210,225,255,0.85)`
 ).join(",");
 const TWINKLE_C = Array.from({ length: 45 }, () =>
-  `${(Math.random() * 2000).toFixed(0)}px ${(Math.random() * 2000).toFixed(0)}px rgba(255,255,255,0.75)`
+  `${(rand() * 2000).toFixed(0)}px ${(rand() * 2000).toFixed(0)}px rgba(255,255,255,0.75)`
 ).join(",");
 
 // Direction-aware slide + fade
@@ -37,6 +46,63 @@ const slideVariants = {
   exit:  (dir: number) => ({ x: dir > 0 ? -36 : 36, opacity: 0, scale: 0.99 }),
 };
 const slideTransition = { duration: 0.3, ease: [0.4, 0, 0.2, 1] as const };
+
+/* ── Viewport-aware shooting stars ── */
+function ShootingStars() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const spawn = () => {
+      const el = document.createElement("div");
+      // Position relative to current scroll so stars appear in the viewport
+      const scrollY = window.scrollY;
+      const vpH = window.innerHeight;
+      const top = scrollY + Math.random() * vpH;
+      const left = Math.random() * 70; // start in the left 70% so the trail stays on screen
+      const width = 100 + Math.random() * 120; // 100–220px trail
+      const angle = 18 + Math.random() * 18;   // 18–36 deg
+      const duration = 1.4 + Math.random() * 1; // 1.4–2.4s visible travel
+
+      el.style.cssText = `
+        position:absolute;
+        top:${top}px;
+        left:${left}%;
+        width:${width}px;
+        height:${1 + Math.random() * 1.2}px;
+        border-radius:999px;
+        pointer-events:none;
+        opacity:0;
+        background:linear-gradient(90deg,transparent 0%,rgba(148,180,255,0.5) 35%,rgba(210,228,255,0.92) 70%,rgba(255,255,255,1) 100%);
+        transform:rotate(${angle}deg) translateX(0);
+      `;
+
+      container.appendChild(el);
+
+      // Animate: fade in → travel → fade out
+      const anim = el.animate(
+        [
+          { opacity: 0, transform: `rotate(${angle}deg) translateX(0)` },
+          { opacity: 0.85, transform: `rotate(${angle}deg) translateX(${width * 0.3}px)`, offset: 0.12 },
+          { opacity: 0.7, transform: `rotate(${angle}deg) translateX(${width * 2.5}px)`, offset: 0.75 },
+          { opacity: 0, transform: `rotate(${angle}deg) translateX(${width * 3.5}px)` },
+        ],
+        { duration: duration * 1000, easing: "ease-out", fill: "forwards" }
+      );
+
+      anim.onfinish = () => el.remove();
+    };
+
+    // Spawn one immediately, then on a recurring interval
+    spawn();
+    const id = setInterval(spawn, 2400 + Math.random() * 1800); // every ~2.4–4.2s
+    return () => clearInterval(id);
+  }, []);
+
+  return <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none" />;
+}
 
 export default function AphelionPage() {
   const [cursor, setCursor]           = useState({ x: 0, y: 0 });
@@ -48,8 +114,10 @@ export default function AphelionPage() {
   const [direction, setDirection] = useState(1);
   const thumbsRef   = useRef<HTMLDivElement>(null);
   const activeThumb = useRef<HTMLButtonElement>(null);
+  const hasInteracted = useRef(false);
 
   const goTo = (index: number) => {
+    hasInteracted.current = true;
     setDirection(index >= current ? 1 : -1);
     setCurrent(index);
   };
@@ -86,8 +154,9 @@ export default function AphelionPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current]);
 
-  // Keep active thumbnail in view when navigating
+  // Keep active thumbnail in view when navigating (skip the initial mount)
   useEffect(() => {
+    if (!hasInteracted.current) return;
     activeThumb.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [current]);
 
@@ -126,12 +195,8 @@ export default function AphelionPage() {
         <div className="twinkle-a" />
         <div className="twinkle-b" />
         <div className="twinkle-c" />
-        {/* Shooting stars */}
-        <div className="ss ss1" />
-        <div className="ss ss2" />
-        <div className="ss ss3" />
-        <div className="ss ss4" />
-        <div className="ss ss5" />
+        {/* Shooting stars — JS-driven so they spawn near the viewport */}
+        <ShootingStars />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col px-6 py-12 font-sans md:px-12 md:py-16 lg:flex-row lg:justify-between lg:gap-6 lg:py-0">
@@ -456,57 +521,7 @@ export default function AphelionPage() {
           to   { opacity: 1.0; }
         }
 
-        /* ── Shooting stars ── */
-        .ss {
-          position: absolute;
-          border-radius: 999px;
-          opacity: 0;
-          pointer-events: none;
-          background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(148, 180, 255, 0.5) 35%,
-            rgba(210, 228, 255, 0.92) 70%,
-            rgba(255, 255, 255, 1) 100%
-          );
-        }
-
-        @keyframes shoot1 {
-          0%    { opacity: 0; transform: rotate(25deg) translateX(0); }
-          4%    { opacity: 0.85; }
-          18%   { opacity: 0; transform: rotate(25deg) translateX(480px); }
-          100%  { opacity: 0; transform: rotate(25deg) translateX(480px); }
-        }
-        @keyframes shoot2 {
-          0%    { opacity: 0; transform: rotate(20deg) translateX(0); }
-          5%    { opacity: 0.70; }
-          22%   { opacity: 0; transform: rotate(20deg) translateX(580px); }
-          100%  { opacity: 0; transform: rotate(20deg) translateX(580px); }
-        }
-        @keyframes shoot3 {
-          0%    { opacity: 0; transform: rotate(32deg) translateX(0); }
-          3.5%  { opacity: 0.92; }
-          15%   { opacity: 0; transform: rotate(32deg) translateX(400px); }
-          100%  { opacity: 0; transform: rotate(32deg) translateX(400px); }
-        }
-        @keyframes shoot4 {
-          0%    { opacity: 0; transform: rotate(18deg) translateX(0); }
-          4.5%  { opacity: 0.75; }
-          20%   { opacity: 0; transform: rotate(18deg) translateX(520px); }
-          100%  { opacity: 0; transform: rotate(18deg) translateX(520px); }
-        }
-        @keyframes shoot5 {
-          0%    { opacity: 0; transform: rotate(28deg) translateX(0); }
-          3.5%  { opacity: 0.82; }
-          17%   { opacity: 0; transform: rotate(28deg) translateX(440px); }
-          100%  { opacity: 0; transform: rotate(28deg) translateX(440px); }
-        }
-
-        /* Each star: different position, size, speed, and delay for natural spacing */
-        .ss1 { top: 9%;  left: 8%;   width: 130px; height: 1.5px; animation: shoot1  9s ease-in  3s  infinite; }
-        .ss2 { top: 22%; left: 52%;  width: 100px; height: 1px;   animation: shoot2 12s ease-in  14s infinite; }
-        .ss3 { top: 4%;  left: -4%;  width: 165px; height: 2px;   animation: shoot3  7s ease-in  26s infinite; }
-        .ss4 { top: 38%; left: 22%;  width: 90px;  height: 1px;   animation: shoot4 14s ease-in  40s infinite; }
-        .ss5 { top: 14%; left: 70%;  width: 118px; height: 1.5px; animation: shoot5  8s ease-in  55s infinite; }
+        /* Shooting stars are now JS-driven (ShootingStars component) */
       `}</style>
     </main>
   );
