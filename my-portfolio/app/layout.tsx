@@ -5,10 +5,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
-const SITE_URL = "https://omarelhawary.dev";
+const SITE_URL = "https://oelhawary.com";
 const SITE_TITLE = "Omar El Hawary — Software Developer";
 const SITE_DESCRIPTION =
-  "London-based software developer building digital products with a focus on usability, polish, and interaction detail. Portfolio, selected work, and contact.";
+  "Software developer based in London. Building polished digital products with React, Next.js, and TypeScript. Explore selected projects and get in touch.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -25,11 +25,12 @@ export const metadata: Metadata = {
     "software developer",
     "front-end developer",
     "full-stack developer",
-    "Next.js",
-    "React",
-    "TypeScript",
-    "London",
     "portfolio",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "Supabase",
+    "London developer",
   ],
   openGraph: {
     type: "website",
