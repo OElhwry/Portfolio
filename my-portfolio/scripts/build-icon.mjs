@@ -6,7 +6,7 @@ import fs from "node:fs/promises";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 
-const SRC = "C:/Users/omare/OneDrive/Pictures/Screenshots/Screenshot 2026-04-16 202202.png";
+const SRC = "C:/Users/omare/OneDrive/Pictures/Screenshots/Screenshot 2026-04-16 234102.png";
 const BG = { r: 11, g: 11, b: 13, alpha: 1 };
 
 const trimmed = await sharp(SRC).trim({ threshold: 20 }).toBuffer();
