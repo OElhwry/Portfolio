@@ -1,7 +1,4 @@
-import path from "path";
+import type { NextConfig } from "next";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  outputFileTracingRoot: path.resolve(__dirname),
-};
+const nextConfig: NextConfig = {};
 export default nextConfig;
