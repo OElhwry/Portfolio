@@ -22,8 +22,9 @@ export default function DeadcenterPage() {
   // Slideshow
   const [current, setCurrent]     = useState(0);
   const [direction, setDirection] = useState(1);
-  const thumbsRef   = useRef<HTMLDivElement>(null);
-  const activeThumb = useRef<HTMLButtonElement>(null);
+  const thumbsRef    = useRef<HTMLDivElement>(null);
+  const activeThumb  = useRef<HTMLButtonElement>(null);
+  const didMount     = useRef(false);
 
   const goTo = (index: number) => {
     setDirection(index >= current ? 1 : -1);
@@ -59,8 +60,9 @@ export default function DeadcenterPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current]);
 
-  // Keep active thumbnail centred in the strip
+  // Keep active thumbnail centred in the strip (skip on first mount to avoid scrolling page to gallery)
   useEffect(() => {
+    if (!didMount.current) { didMount.current = true; return; }
     activeThumb.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [current]);
 
