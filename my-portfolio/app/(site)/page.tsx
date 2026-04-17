@@ -263,7 +263,7 @@ export default function PortfolioPage() {
                 </span>
                 Available for work
               </span>
-              {["London / Remote", "Junior – Mid-level"].map((stat) => (
+              {["London / Remote", "Junior to Mid Level"].map((stat) => (
                 <span
                   key={stat}
                   className="rounded-full px-3 py-1 text-[11px] font-medium text-indigo-200/80"
@@ -415,13 +415,13 @@ export default function PortfolioPage() {
                 <a href="https://www.qmul.ac.uk" target="_blank" rel="noreferrer" className="transition-colors hover:text-indigo-300">Queen Mary University of London</a>
               </span>
               , where the fundamentals clicked across algorithms, systems, and software design.
-              Front-end is what grabbed me first — the speed of shipping something people can
-              actually touch — but I&apos;m just as interested in the wider craft of building
+              Frontend is what grabbed me first, driven by the speed of shipping something people can
+              actually touch, but I&apos;m just as interested in the wider craft of building
               software.
             </p>
             <p className="leading-relaxed">
-              I&apos;m looking for <span className="font-medium text-slate-200">junior to mid-level</span>{" "}
-              opportunities in London or remote. Front-end and full-stack roles are the obvious
+              I&apos;m looking for <span className="font-medium text-slate-200">junior to mid level</span>{" "}
+              opportunities in London or remote. Frontend and full stack roles are the obvious
               fit, but I&apos;m open to anything across software and computing where I can keep
               levelling up alongside a team that cares about its work.
             </p>
@@ -457,7 +457,7 @@ export default function PortfolioPage() {
                       Box Office Assistant · Winter Wonderland
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed">
-                      Front-line support at one of London&apos;s busiest seasonal attractions.
+                      Frontline support at one of London&apos;s busiest seasonal attractions.
                       Thought on my feet to solve ticketing issues, calmed frustrated guests, and
                       kept thousands of people moving through the gates without the queue breaking down.
                     </p>

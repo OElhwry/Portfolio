@@ -118,7 +118,7 @@ export default function DeadcenterPage() {
             </h2>
 
             <p className="mt-4 max-w-xs leading-relaxed text-slate-400">
-              A browser precision-timing game. One input, 20 levels, four tiers: Warmup through to Impossible.
+              A browser precision timing game. One input, 20 levels, four tiers: Warmup through to Impossible.
             </p>
 
             {/* Tech badges */}
@@ -375,7 +375,7 @@ export default function DeadcenterPage() {
           {/* Design */}
           <section id="design" aria-label="Design" className="space-y-4 scroll-mt-24">
             <p>
-              The single-input constraint meant every layer of depth had to come from level design, not controls. The momentum system scales dot speed up to 4× on Impossible, so the same gesture that works on level five is completely unreadable by level fifteen. The rules don&apos;t change. Everything else does.
+              The single input constraint meant every layer of depth had to come from level design, not controls. The momentum system scales dot speed up to 4× on Impossible, so the same gesture that works on level five is completely unreadable by level fifteen. The rules don&apos;t change. Everything else does.
             </p>
             <p>
               Audio is written directly with the Web Audio API, with no library in the chain. That kept the bundle small and gave precise control over how the synth shifts between tiers. The soundtrack isn&apos;t background music, it&apos;s paced to match difficulty, so the tension builds without any UI signalling it. The entire game lives in a single{" "}

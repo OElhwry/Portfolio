@@ -122,7 +122,7 @@ export default function PeerFitV1Page() {
             </h2>
 
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-400">
-              A sports matchmaking platform built from scratch in PHP and MySQL — no frameworks, no shortcuts.
+              A sports matchmaking platform built from scratch in PHP and MySQL. No frameworks. No shortcuts.
             </p>
 
             {/* Tech badges */}
@@ -205,7 +205,7 @@ export default function PeerFitV1Page() {
             </div>
             <p>
               PeerFit v1 was the project that started everything. A social sports platform built
-              entirely from scratch — user accounts, profile management, activity matching, friend
+              entirely from scratch: user accounts, profile management, activity matching, friend
               requests, and real-time chat, all running on{" "}
               <span className="font-medium text-slate-200">
                 <a href="https://www.php.net/" target="_blank" rel="noreferrer" className="transition-colors hover:text-amber-300">PHP</a>
