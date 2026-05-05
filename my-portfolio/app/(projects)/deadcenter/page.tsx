@@ -106,19 +106,23 @@ export default function DeadcenterPage() {
         {/* ── LEFT PANEL ── */}
         <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[46%] lg:flex-col lg:justify-between lg:py-24">
           <div>
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-orange-400/50">
+              Precision Game
+            </p>
             <h1
               className="text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl"
               style={{ textShadow: "0 0 45px rgba(249,115,22,0.28), 0 0 90px rgba(234,88,12,0.12)" }}
             >
               Deadcenter
             </h1>
+            <div className="mt-2 h-px w-16 bg-gradient-to-r from-orange-400/70 to-transparent" />
 
             <h2 className="mt-3 text-lg font-mono font-medium text-orange-400/70 sm:text-xl">
               Stop the dot.
             </h2>
 
             <p className="mt-4 max-w-xs leading-relaxed text-slate-400">
-              A browser precision timing game. One input, 20 levels, four tiers: Warmup through to Impossible.
+              A browser precision timing game. One input, 12 levels, four tiers: Warmup through to Impossible.
             </p>
 
             {/* Tech badges */}
@@ -202,7 +206,7 @@ export default function DeadcenterPage() {
               <span className="text-orange-400/80 font-medium">Needs Work</span>.
             </p>
             <p>
-              Twenty levels span four tiers: <span className="text-slate-200 font-medium">I, II, III, and ∞</span>. Each introduces movement patterns that change the challenge completely. The early levels ease you in with steady bounces and sine drifts. By Impossible, you&apos;re chasing a near-invisible ghost dot through patterns that shift faster than you can read them.
+              Twelve levels span four tiers: <span className="text-slate-200 font-medium">I, II, III, and ∞</span>. Each introduces movement patterns that change the challenge completely. The early levels ease you in with steady bounces and sine drifts. By Impossible, you&apos;re chasing a near-invisible ghost dot through patterns that shift faster than you can read them.
             </p>
             <p>
               Built with{" "}
@@ -217,6 +221,78 @@ export default function DeadcenterPage() {
               A run builder lets you pick individual levels or full tiers, so each session can be a casual warmup, a personal record chase, or a grudge match with the level that got you last time.
             </p>
           </section>
+
+          {/* ── KEY FEATURES ── */}
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="mb-7">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-orange-400/45">
+                What it does
+              </p>
+              <h3 className="text-xl font-semibold tracking-wide text-slate-100">Key features</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                  ),
+                  title: "One mechanic",
+                  body: "Click, tap, or press Space. One input to stop a moving dot as close to the target as possible.",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z" />
+                    </svg>
+                  ),
+                  title: "12 levels, 4 tiers",
+                  body: "Warmup, I, II, and Impossible. Movement patterns escalate dramatically — the rules stay the same, everything else changes.",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M18 20V10M12 20V4M6 20v-6" />
+                    </svg>
+                  ),
+                  title: "Precision scoring",
+                  body: "Dead Center (90-100), Sharp, Decent, Shaky. Every stop graded to the nearest millisecond.",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+                    </svg>
+                  ),
+                  title: "Web Audio synth",
+                  body: "Soundtrack written with the Web Audio API. Intensifies per tier with no library in the chain.",
+                },
+              ].map((f) => (
+                <div
+                  key={f.title}
+                  className="rounded-xl p-4 transition-all hover:border-orange-400/25"
+                  style={{
+                    background: "rgba(12,8,6,0.55)",
+                    border: "1px solid rgba(249,115,22,0.12)",
+                  }}
+                >
+                  <div
+                    className="mb-3 inline-flex items-center justify-center rounded-lg p-2 text-orange-400"
+                    style={{ background: "rgba(249,115,22,0.10)" }}
+                  >
+                    {f.icon}
+                  </div>
+                  <h4 className="mb-1.5 text-sm font-semibold text-slate-200">{f.title}</h4>
+                  <p className="text-xs leading-relaxed text-slate-400">{f.body}</p>
+                </div>
+              ))}
+            </div>
+          </motion.section>
 
           {/* ── SLIDESHOW GALLERY ── */}
           <motion.section
@@ -233,7 +309,7 @@ export default function DeadcenterPage() {
               </p>
               <h3 className="text-2xl font-semibold tracking-wide text-slate-100">Screenshots</h3>
               <p className="mt-2 max-w-md text-sm text-slate-400">
-                20 levels. 4 tiers. One input.
+                12 levels. 4 tiers. One input.
               </p>
               <div className="mt-4 h-px w-24 rounded-full bg-gradient-to-r from-transparent via-orange-400/65 to-transparent" />
             </div>

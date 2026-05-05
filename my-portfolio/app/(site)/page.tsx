@@ -2,60 +2,71 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import ProjectThumbnail from "@/components/ProjectThumbnail";
 
 const PROJECTS = [
+  {
+    href: "/emplorio",
+    title: "Emplorio",
+    eyebrow: "Chrome extension",
+    description:
+      "Apply once, send everywhere. A Manifest V3 Chrome extension that auto-fills job applications across nine major ATS platforms — Greenhouse, Lever, Workday, Ashby, LinkedIn, and more — and drafts tailored cover letters, answers, and follow-ups with Claude. Bring-your-own API key, EU-only data, no telemetry. Live at emplorio.co.uk.",
+    tags: ["TypeScript", "Next.js 15", "Fastify", "Claude API"],
+    thumbnail: "emplorio" as const,
+    accentHover: "group-hover:text-violet-300",
+    tagColor: "bg-violet-400/10 text-violet-300 border border-violet-400/20",
+  },
   {
     href: "/peerfitv2",
     title: "PeerFit v2",
     eyebrow: "Flagship project",
     description:
-      "A social sports platform where users discover local sessions, match by skill level, and build a profile with stats, badges, and peer reviews. Full production rebuild with Next.js 15, Supabase auth, SSR sessions, and light/dark theming. Live at peerfit.co.uk.",
+      "A social sports platform that connects nearby players for pickup games across 15+ activities. Post a session, find teammates, build reliability through peer ratings, and let the app handle the coordination. Full production build on Next.js 15 with Supabase auth, SSR sessions, and a numbered, editorial landing page. Live at peerfit.co.uk.",
     tags: ["Next.js 15", "TypeScript", "Supabase", "Tailwind 4"],
     thumbnail: "peerfitV2" as const,
     accentHover: "group-hover:text-teal-300",
     tagColor: "bg-teal-400/10 text-teal-300 border border-teal-400/20",
   },
   {
-    href: "/deadcenter",
-    title: "Deadcenter",
-    eyebrow: "Browser game",
-    description:
-      "A precision reaction game with one rule: stop the dot. Twenty hand-designed levels across four difficulty tiers layer in bounces, orbits, and near-chaotic movement to keep a single mechanic endlessly engaging.",
-    tags: ["React 19", "JavaScript", "Vite 8", "Web Audio API"],
-    thumbnail: "deadcenter" as const,
-    accentHover: "group-hover:text-orange-300",
-    tagColor: "bg-orange-400/10 text-orange-300 border border-orange-400/20",
-  },
-  {
-    href: "/kvit",
-    title: "Kvit",
-    eyebrow: "Utility",
-    description:
-      "A zero-friction bill splitter built for the moment the waiter brings the card machine. Enter who spent what, pick equal or custom splits, and it calculates the smallest set of transfers to settle up. Works offline, no sign-up.",
-    tags: ["React 19", "Vite", "Lucide React", "html2canvas"],
-    thumbnail: "kvit" as const,
-    accentHover: "group-hover:text-emerald-300",
-    tagColor: "bg-emerald-400/10 text-emerald-300 border border-emerald-400/20",
-  },
-  {
     href: "/aphelion",
     title: "Aphelion",
     eyebrow: "Interactive",
     description:
-      "An interactive space app that turns planetary exploration into something cinematic. Surfaces Mars imagery, solar system data, and planetary facts in a clean, visual-first interface, with an integrated quiz to test what you have learned.",
+      "A cinematic interactive solar system. Scroll driven storytelling, animated planet exploration, Mars imagery, and an integrated quiz, all in a clean visual first interface. Live at aphelion.website.",
     tags: ["Next.js 14", "TypeScript", "Tailwind CSS", "Framer Motion"],
     thumbnail: "aphelion" as const,
     accentHover: "group-hover:text-sky-300",
     tagColor: "bg-sky-400/10 text-sky-300 border border-sky-400/20",
   },
   {
+    href: "/deadcenter",
+    title: "Deadcenter",
+    eyebrow: "Browser game",
+    description:
+      "A fast, minimal precision timing game with one rule. Stop the dot. Twenty hand designed levels across four difficulty tiers layer in bounces, orbits, escalating patterns, and synth audio that turns a single mechanic into something genuinely brutal. Live at deadcenter.fun.",
+    tags: ["React 19", "JavaScript", "Vite 8", "Web Audio API"],
+    thumbnail: "deadcenter" as const,
+    accentHover: "group-hover:text-orange-300",
+    tagColor: "bg-orange-400/10 text-orange-300 border border-orange-400/20",
+  },
+  {
+    href: "/splidit",
+    title: "SplidIt",
+    eyebrow: "Utility",
+    description:
+      "A no friction expense splitter built for the moment the waiter brings the card machine. Enter who spent what, pick equal or custom splits, and it works out the smallest set of transfers to settle up. Runs offline, no signup. Live at splidit.co.uk.",
+    tags: ["React 19", "Vite", "Lucide React", "html2canvas"],
+    thumbnail: "splidit" as const,
+    accentHover: "group-hover:text-emerald-300",
+    tagColor: "bg-emerald-400/10 text-emerald-300 border border-emerald-400/20",
+  },
+  {
     href: "/peerfitv1",
     title: "PeerFit v1",
     eyebrow: "Origin",
     description:
-      "The original version of PeerFit, built with PHP and MySQL on XAMPP. It proved the concept (accounts, activity posts, basic matching) and became the foundation the v2 React rebuild was designed to outgrow.",
+      "The original version of PeerFit, built with PHP and MySQL on XAMPP. It proved the concept of accounts, activity posts, and basic matching, and became the foundation the v2 React rebuild was designed to outgrow.",
     tags: ["PHP", "MySQL", "JavaScript", "XAMPP"],
     thumbnail: "peerfitV1" as const,
     accentHover: "group-hover:text-amber-300",
@@ -73,6 +84,20 @@ export default function PortfolioPage() {
   const [activeSection, setActiveSection] = useState("about");
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
   const [copied, setCopied] = useState(false);
+
+  // Scroll-tied trail running alongside the projects list
+  const projectsListRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: projectsScroll } = useScroll({
+    target: projectsListRef,
+    offset: ["start 80%", "end 20%"],
+  });
+  const trailScaleY = useTransform(projectsScroll, [0, 1], [0, 1]);
+  const cometTop = useTransform(projectsScroll, [0, 1], ["0%", "100%"]);
+  const cometOpacity = useTransform(
+    projectsScroll,
+    [0, 0.04, 0.96, 1],
+    [0, 1, 1, 0]
+  );
 
   const copyEmail = () => {
     navigator.clipboard.writeText(EMAIL).then(() => {
@@ -494,57 +519,121 @@ export default function PortfolioPage() {
 
           {/* ── PROJECTS ── */}
           <section id="projects" className="scroll-mt-24" aria-label="Projects">
-            <div className="mb-8 lg:hidden">
+            <div className="mb-6 lg:hidden">
               <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-sky-400/45">
                 Selected work
               </p>
               <h3 className="text-xl font-semibold tracking-wide text-slate-100">Projects</h3>
             </div>
 
-            <ul className="group/list space-y-2">
-              {PROJECTS.map((project, idx) => (
-                <li key={project.href} className={idx < PROJECTS.length - 1 ? "mb-10" : ""}>
-                  <a
-                    href={project.href}
-                    className="group relative grid gap-4 pb-1 transition-all hover:!opacity-100 sm:grid-cols-8 sm:gap-8 md:gap-4 lg:group-hover/list:opacity-50"
-                  >
-                    <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-lg transition lg:block group-hover:bg-sky-500/5 group-hover:shadow-[inset_0_1px_0_0_rgba(56,189,248,0.14)] group-hover:drop-shadow-lg" />
+            {/* CTA — sets the expectation that each card opens its own page */}
+            <p className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-400">
+              <span
+                aria-hidden="true"
+                className="inline-block h-px w-6"
+                style={{
+                  background:
+                    "linear-gradient(to right, transparent, rgba(129,140,248,0.55))",
+                }}
+              />
+              <span className="text-slate-300">Tap any project</span>
+              <span>for the full breakdown</span>
+              <span aria-hidden="true" className="text-sky-400/70">→</span>
+            </p>
 
-                    {/* Thumbnail */}
-                    <div className="relative z-10 sm:order-1 sm:col-span-2">
-                      <div className="transition group-hover:scale-[1.04] duration-500">
-                        <ProjectThumbnail project={project.thumbnail} />
+            <div ref={projectsListRef} className="relative">
+              {/* Scroll-tied comet trail — desktop only */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-5 top-2 bottom-2 hidden w-px lg:block"
+              >
+                {/* Faint background track */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to bottom, rgba(148,163,184,0.04) 0%, rgba(148,163,184,0.13) 25%, rgba(148,163,184,0.13) 75%, rgba(148,163,184,0.04) 100%)",
+                  }}
+                />
+                {/* Active progress, fills as you scroll */}
+                <motion.div
+                  className="absolute inset-x-0 top-0 origin-top"
+                  style={{
+                    scaleY: trailScaleY,
+                    background:
+                      "linear-gradient(to bottom, rgba(56,189,248,0.75) 0%, rgba(129,140,248,0.75) 55%, rgba(167,139,250,0.65) 100%)",
+                  }}
+                />
+                {/* Glowing comet head */}
+                <motion.div
+                  className="absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{
+                    top: cometTop,
+                    opacity: cometOpacity,
+                    background:
+                      "radial-gradient(circle at center, rgba(224,242,254,1) 0%, rgba(56,189,248,0.9) 45%, transparent 75%)",
+                    boxShadow:
+                      "0 0 14px 1px rgba(56,189,248,0.65), 0 0 32px 6px rgba(129,140,248,0.35)",
+                  }}
+                />
+              </div>
+
+              <ul className="group/list space-y-2">
+                {PROJECTS.map((project, idx) => (
+                  <li key={project.href} className={idx < PROJECTS.length - 1 ? "mb-10" : ""}>
+                    <a
+                      href={project.href}
+                      className="group relative grid gap-4 pb-1 transition-all hover:!opacity-100 sm:grid-cols-8 sm:gap-8 md:gap-4 lg:group-hover/list:opacity-50"
+                    >
+                      <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-lg transition lg:block group-hover:bg-sky-500/5 group-hover:shadow-[inset_0_1px_0_0_rgba(56,189,248,0.14)] group-hover:drop-shadow-lg" />
+
+                      {/* Thumbnail */}
+                      <div className="relative z-10 sm:order-1 sm:col-span-2">
+                        <div className="transition group-hover:scale-[1.04] duration-500">
+                          <ProjectThumbnail project={project.thumbnail} />
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Content */}
-                    <div className="z-10 sm:order-2 sm:col-span-6">
-                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-400/50">
-                        {project.eyebrow}
-                      </p>
-                      <h3 className={`flex items-center gap-2 font-medium leading-tight text-slate-200 transition ${project.accentHover}`}>
-                        {project.title}
-                        <span className="inline-block text-slate-500 transition-transform group-hover:translate-x-0.5 group-hover:text-current">
-                          →
-                        </span>
-                      </h3>
-                      <p className="mt-2 text-sm leading-relaxed">
-                        {project.description}
-                      </p>
-                      <ul className="mt-3 flex flex-wrap gap-1.5">
-                        {project.tags.map((tag) => (
-                          <li key={tag}>
-                            <div className={`rounded-full px-3 py-1 text-xs font-medium ${project.tagColor}`}>
-                              {tag}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
+                      {/* Content */}
+                      <div className="z-10 sm:order-2 sm:col-span-6">
+                        <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-400/50">
+                          {project.eyebrow}
+                        </p>
+                        <h3 className={`flex items-center gap-2 font-medium leading-tight text-slate-200 transition ${project.accentHover}`}>
+                          {project.title}
+                          <span className="inline-block text-slate-500 transition-transform group-hover:translate-x-0.5 group-hover:text-current">
+                            →
+                          </span>
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed">
+                          {project.description}
+                        </p>
+                        <ul className="mt-3 flex flex-wrap gap-1.5">
+                          {project.tags.map((tag) => (
+                            <li key={tag}>
+                              <div className={`rounded-full px-3 py-1 text-xs font-medium ${project.tagColor}`}>
+                                {tag}
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                        <div
+                          className={`mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500 transition ${project.accentHover}`}
+                        >
+                          View case study
+                          <span
+                            aria-hidden="true"
+                            className="inline-block transition-transform group-hover:translate-x-1"
+                          >
+                            →
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
 
           {/* ── FOOTER / CLOSING NOTE ── */}

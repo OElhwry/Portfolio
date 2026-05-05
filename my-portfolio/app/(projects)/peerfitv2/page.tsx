@@ -17,15 +17,14 @@ const slideVariants = {
 };
 const slideTransition = { duration: 0.28, ease: [0.4, 0, 0.2, 1] as const };
 
-// Gallery groups — indices into ALL_SCREENSHOTS (21 total after home2–5 were added)
-// 0–4:  Homepage (x5)   5: Feed   6: Feed Cards   7: Filters   8: Night Mode
-// 9: Calendar   10: Friends   11–15: Auth (5)   16–18: Profile (3)   19–20: Settings (2)
+// Gallery groups — indices into ALL_SCREENSHOTS (20 total)
+// 0–7: Homepage (landing + home1–7)   8–11: Feed   12–17: Auth   18–19: Profile & Settings
 const GALLERY_GROUPS = [
-  { id: "all",      label: "All",      shots: ALL_SCREENSHOTS              },
-  { id: "feed",     label: "Feed",     shots: ALL_SCREENSHOTS.slice(0, 11) },
-  { id: "auth",     label: "Auth",     shots: ALL_SCREENSHOTS.slice(11, 16)},
-  { id: "profile",  label: "Profile",  shots: ALL_SCREENSHOTS.slice(16, 19)},
-  { id: "settings", label: "Settings", shots: ALL_SCREENSHOTS.slice(19)    },
+  { id: "all",     label: "All",     shots: ALL_SCREENSHOTS               },
+  { id: "home",    label: "Home",    shots: ALL_SCREENSHOTS.slice(0, 8)   },
+  { id: "feed",    label: "Feed",    shots: ALL_SCREENSHOTS.slice(8, 12)  },
+  { id: "auth",    label: "Auth",    shots: ALL_SCREENSHOTS.slice(12, 18) },
+  { id: "profile", label: "Profile", shots: ALL_SCREENSHOTS.slice(18)     },
 ];
 
 export default function PeerfitV2Page() {

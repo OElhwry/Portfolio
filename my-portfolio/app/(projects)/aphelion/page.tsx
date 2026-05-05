@@ -204,12 +204,16 @@ export default function AphelionPage() {
         {/* ── LEFT PANEL ── */}
         <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[46%] lg:flex-col lg:justify-between lg:py-24">
           <div>
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-indigo-400/50">
+              Space Explorer
+            </p>
             <h1
               className="text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl"
               style={{ textShadow: "0 0 50px rgba(129,140,248,0.28), 0 0 100px rgba(99,102,241,0.12)" }}
             >
               Aphelion
             </h1>
+            <div className="mt-2 h-px w-16 bg-gradient-to-r from-indigo-400/70 to-transparent" />
             <h2 className="mt-3 text-lg font-mono font-medium text-indigo-300/80 sm:text-xl">
               Solar system explorer
             </h2>
@@ -314,6 +318,79 @@ export default function AphelionPage() {
               for scroll-triggered animation. The quiz engine and all planetary content are authored directly, with no external API dependency, keeping the experience fast, consistent, and fully offline-capable.
             </p>
           </section>
+
+          {/* ── KEY FEATURES ── */}
+          <motion.section
+            className="scroll-mt-24"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="mb-7">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-indigo-400/45">
+                What it does
+              </p>
+              <h3 className="text-xl font-semibold tracking-wide text-slate-100">Key features</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+                    </svg>
+                  ),
+                  title: "Scroll-driven journey",
+                  body: "Ten worlds revealed in sequence. Cinematic pacing from the Sun's corona to the frozen edge of the system.",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                  ),
+                  title: "50 quiz questions",
+                  body: "Questions land after each planet's exploration content — immersion first, testing second.",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                  ),
+                  title: "Distance HUD",
+                  body: "Persistent progress tracker in millions of kilometres — the sense of scale stays present throughout.",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <path d="M18.36 6.64a9 9 0 1 1-12.73 0" /><line x1="12" y1="2" x2="12" y2="12" />
+                    </svg>
+                  ),
+                  title: "Fully offline-capable",
+                  body: "No external API dependency. All planetary content authored directly — fast, consistent, and cached.",
+                },
+              ].map((f) => (
+                <div
+                  key={f.title}
+                  className="rounded-xl p-4 transition-all hover:border-indigo-400/25"
+                  style={{
+                    background: "rgba(10,12,35,0.55)",
+                    border: "1px solid rgba(99,102,241,0.12)",
+                  }}
+                >
+                  <div
+                    className="mb-3 inline-flex items-center justify-center rounded-lg p-2 text-indigo-400"
+                    style={{ background: "rgba(99,102,241,0.10)" }}
+                  >
+                    {f.icon}
+                  </div>
+                  <h4 className="mb-1.5 text-sm font-semibold text-slate-200">{f.title}</h4>
+                  <p className="text-xs leading-relaxed text-slate-400">{f.body}</p>
+                </div>
+              ))}
+            </div>
+          </motion.section>
 
           {/* ── SLIDESHOW GALLERY ── */}
           <motion.section

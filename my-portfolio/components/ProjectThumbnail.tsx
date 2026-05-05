@@ -5,7 +5,7 @@
  * Each project gets a distinctive icon + gradient — no screenshot images needed.
  */
 
-type ProjectKey = "peerfitV2" | "deadcenter" | "kvit" | "aphelion" | "peerfitV1";
+type ProjectKey = "emplorio" | "peerfitV2" | "deadcenter" | "splidit" | "aphelion" | "peerfitV1";
 
 interface Props {
   project: ProjectKey;
@@ -16,6 +16,13 @@ const palette: Record<
   ProjectKey,
   { bg: string; glow: string; icon: string; accent: string; pattern: string }
 > = {
+  emplorio: {
+    bg: "from-violet-950/85 via-indigo-900/40 to-slate-950/95",
+    glow: "rgba(139,92,246,0.20)",
+    icon: "text-violet-300",
+    accent: "rgba(139,92,246,0.14)",
+    pattern: "rgba(167,139,250,0.07)",
+  },
   peerfitV2: {
     bg: "from-teal-950/80 via-teal-900/40 to-slate-950/90",
     glow: "rgba(45,212,191,0.18)",
@@ -30,7 +37,7 @@ const palette: Record<
     accent: "rgba(251,146,60,0.12)",
     pattern: "rgba(251,146,60,0.07)",
   },
-  kvit: {
+  splidit: {
     bg: "from-emerald-950/80 via-emerald-900/40 to-slate-950/90",
     glow: "rgba(52,211,153,0.18)",
     icon: "text-emerald-400",
@@ -54,6 +61,28 @@ const palette: Record<
 };
 
 /* ── icon SVGs ── */
+
+function EmplorioIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" fill="none" className={className}>
+      {/* Form with AI sparkle — autofill + Claude */}
+      <rect x="10" y="12" width="44" height="40" rx="4" stroke="currentColor" strokeWidth="1.5" opacity="0.45" />
+      {/* Filled field with check */}
+      <line x1="16" y1="22" x2="38" y2="22" stroke="currentColor" strokeWidth="1.5" opacity="0.55" />
+      <polyline points="42,21 44.5,23.5 49,19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+      {/* Filled field with check */}
+      <line x1="16" y1="30" x2="34" y2="30" stroke="currentColor" strokeWidth="1.5" opacity="0.45" />
+      <polyline points="42,29 44.5,31.5 49,27" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+      {/* Field being filled — caret */}
+      <line x1="16" y1="38" x2="30" y2="38" stroke="currentColor" strokeWidth="1.5" opacity="0.35" />
+      <line x1="30" y1="35" x2="30" y2="41" stroke="currentColor" strokeWidth="1.4" opacity="0.7" />
+      {/* Sparkle / AI mark, top-right corner */}
+      <path d="M48 6 L49.2 9.5 L52.5 10.5 L49.2 11.5 L48 15 L46.8 11.5 L43.5 10.5 L46.8 9.5 Z" fill="currentColor" opacity="0.85" />
+      <circle cx="42" cy="46" r="0.9" fill="currentColor" opacity="0.4" />
+      <circle cx="46" cy="44" r="0.7" fill="currentColor" opacity="0.3" />
+    </svg>
+  );
+}
 
 function PeerfitV2Icon({ className }: { className?: string }) {
   return (
@@ -92,7 +121,7 @@ function DeadcenterIcon({ className }: { className?: string }) {
   );
 }
 
-function KvitIcon({ className }: { className?: string }) {
+function SplidItIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" fill="none" className={className}>
       {/* Split / divide receipt */}
@@ -156,9 +185,10 @@ function PeerfitV1Icon({ className }: { className?: string }) {
 }
 
 const icons: Record<ProjectKey, React.FC<{ className?: string }>> = {
+  emplorio: EmplorioIcon,
   peerfitV2: PeerfitV2Icon,
   deadcenter: DeadcenterIcon,
-  kvit: KvitIcon,
+  splidit: SplidItIcon,
   aphelion: AphelionIcon,
   peerfitV1: PeerfitV1Icon,
 };

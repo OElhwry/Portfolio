@@ -7,7 +7,7 @@ const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 const SITE_URL = "https://oelhawary.com";
-const SITE_TITLE = "Omar El Hawary — Software Developer";
+const SITE_TITLE = "Omar El Hawary | Software Developer";
 const SITE_DESCRIPTION =
   "Software developer based in London. Building polished digital products with React, Next.js, and TypeScript. Explore selected projects and get in touch.";
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: "%s — Omar El Hawary",
+    template: "%s | Omar El Hawary",
   },
   description: SITE_DESCRIPTION,
   applicationName: "Omar El Hawary",
