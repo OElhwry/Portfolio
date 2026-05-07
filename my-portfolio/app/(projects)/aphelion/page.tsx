@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { aphelionScreenshots as SCREENSHOTS } from "@/lib/project-media";
+import {
+  AquariusConstellation,
+  CapricornConstellation,
+  LeoConstellation,
+} from "@/components/Constellations";
 
 // Seeded PRNG so server and client produce identical star positions (fixes hydration mismatch)
 function mulberry32(seed: number) {
@@ -295,7 +300,8 @@ export default function AphelionPage() {
         <div className="lg:w-[54%] py-24 space-y-24">
 
           {/* About */}
-          <section id="about" className="space-y-4 scroll-mt-24">
+          <section id="about" className="relative isolate space-y-4 scroll-mt-24">
+            <AquariusConstellation className="-top-16 right-[-3rem] h-[440px] w-[440px] -z-10 opacity-60" />
             <p>
               Aphelion frames the solar system as a journey, not a reference. You arrive at a launch sequence, get addressed as Commander, and from the moment you click Begin Mission you&apos;re moving through the Sun&apos;s corona, past the inner planets, outward into the gas giants, and all the way to the cold edge of the system.
             </p>
@@ -321,11 +327,12 @@ export default function AphelionPage() {
 
           {/* ── KEY FEATURES ── */}
           <motion.section
-            className="scroll-mt-24"
+            className="relative isolate scroll-mt-24"
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
+            <CapricornConstellation className="-top-8 -left-16 h-[440px] w-[440px] -z-10 opacity-60" />
             <div className="mb-7">
               <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-indigo-400/45">
                 What it does
@@ -559,7 +566,8 @@ export default function AphelionPage() {
           </motion.section>
 
           {/* Insights */}
-          <section id="insights" aria-label="Insights" className="space-y-4 scroll-mt-24">
+          <section id="insights" aria-label="Insights" className="relative isolate space-y-4 scroll-mt-24">
+            <LeoConstellation className="-top-16 right-[-4rem] h-[440px] w-[440px] -z-10 opacity-60" />
             <p>
               The design challenge wasn&apos;t making it look like a space app. That part is simple enough. The harder part was making it feel like a journey rather than a reference page. Scroll-triggered state, a persistent distance HUD, and a cinematic launch sequence all work toward the same goal: convincing you that you&apos;re moving through something, not just reading about it.
             </p>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import ProjectThumbnail from "@/components/ProjectThumbnail";
 
 const PROJECTS = [
@@ -84,20 +84,6 @@ export default function PortfolioPage() {
   const [activeSection, setActiveSection] = useState("about");
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
   const [copied, setCopied] = useState(false);
-
-  // Scroll-tied trail running alongside the projects list
-  const projectsListRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: projectsScroll } = useScroll({
-    target: projectsListRef,
-    offset: ["start 80%", "end 20%"],
-  });
-  const trailScaleY = useTransform(projectsScroll, [0, 1], [0, 1]);
-  const cometTop = useTransform(projectsScroll, [0, 1], ["0%", "100%"]);
-  const cometOpacity = useTransform(
-    projectsScroll,
-    [0, 0.04, 0.96, 1],
-    [0, 1, 1, 0]
-  );
 
   const copyEmail = () => {
     navigator.clipboard.writeText(EMAIL).then(() => {
@@ -242,7 +228,11 @@ export default function PortfolioPage() {
 
         {/* ── LEFT PANEL ── */}
         <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[46%] lg:flex-col lg:justify-between lg:py-16">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
             {/* Eyebrow */}
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-400/55">
               Portfolio · 2026
@@ -334,10 +324,16 @@ export default function PortfolioPage() {
                 })}
               </ul>
             </nav>
-          </div>
+          </motion.div>
 
           {/* Social Links */}
-          <ul className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4" aria-label="Social links">
+          <motion.ul
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4"
+            aria-label="Social links"
+          >
             <li>
               <a
                 href="https://github.com/OElhwry"
@@ -416,14 +412,21 @@ export default function PortfolioPage() {
                 <span className="inline-block text-sky-600 transition-transform group-hover:translate-x-0.5 group-hover:text-sky-400">→</span>
               </Link>
             </li>
-          </ul>
+          </motion.ul>
         </header>
 
         {/* ── RIGHT CONTENT ── */}
         <div className="space-y-16 pt-10 pb-14 md:space-y-20 md:pt-12 md:pb-20 lg:space-y-24 lg:py-24 lg:w-[54%]">
 
           {/* ── ABOUT ── */}
-          <section id="about" className="scroll-mt-24 space-y-5">
+          <motion.section
+            id="about"
+            className="relative isolate scroll-mt-24 space-y-5"
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-10% 0px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
             <p className="leading-relaxed text-slate-300">
               I&apos;m Omar, a London-based developer building digital products with a strong
               focus on <span className="font-medium text-slate-200">usability</span>,{" "}
@@ -455,10 +458,17 @@ export default function PortfolioPage() {
               or losing at chess in increasingly creative ways. This portfolio is one of my
               favourite side projects, so feel free to poke around.
             </p>
-          </section>
+          </motion.section>
 
           {/* ── EXPERIENCE ── */}
-          <section id="experience" className="scroll-mt-24">
+          <motion.section
+            id="experience"
+            className="relative isolate scroll-mt-24"
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-10% 0px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div className="mb-6 lg:hidden">
               <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-sky-400/45">
                 Career
@@ -466,7 +476,12 @@ export default function PortfolioPage() {
               <h3 className="text-xl font-semibold tracking-wide text-slate-100">Experience</h3>
             </div>
             <ol className="group/joblist space-y-2">
-              <li>
+              <motion.li
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-10% 0px" }}
+                transition={{ duration: 0.5, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <a
                   href="https://hydeparkwinterwonderland.com/"
                   target="_blank"
@@ -488,9 +503,14 @@ export default function PortfolioPage() {
                     </p>
                   </div>
                 </a>
-              </li>
+              </motion.li>
 
-              <li>
+              <motion.li
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-10% 0px" }}
+                transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <a
                   href="https://www.nhs.uk/"
                   target="_blank"
@@ -513,9 +533,9 @@ export default function PortfolioPage() {
                     </p>
                   </div>
                 </a>
-              </li>
+              </motion.li>
             </ol>
-          </section>
+          </motion.section>
 
           {/* ── PROJECTS ── */}
           <section id="projects" className="scroll-mt-24" aria-label="Projects">
@@ -541,46 +561,17 @@ export default function PortfolioPage() {
               <span aria-hidden="true" className="text-sky-400/70">→</span>
             </p>
 
-            <div ref={projectsListRef} className="relative">
-              {/* Scroll-tied comet trail — desktop only */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -left-5 top-2 bottom-2 hidden w-px lg:block"
-              >
-                {/* Faint background track */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom, rgba(148,163,184,0.04) 0%, rgba(148,163,184,0.13) 25%, rgba(148,163,184,0.13) 75%, rgba(148,163,184,0.04) 100%)",
-                  }}
-                />
-                {/* Active progress, fills as you scroll */}
-                <motion.div
-                  className="absolute inset-x-0 top-0 origin-top"
-                  style={{
-                    scaleY: trailScaleY,
-                    background:
-                      "linear-gradient(to bottom, rgba(56,189,248,0.75) 0%, rgba(129,140,248,0.75) 55%, rgba(167,139,250,0.65) 100%)",
-                  }}
-                />
-                {/* Glowing comet head */}
-                <motion.div
-                  className="absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{
-                    top: cometTop,
-                    opacity: cometOpacity,
-                    background:
-                      "radial-gradient(circle at center, rgba(224,242,254,1) 0%, rgba(56,189,248,0.9) 45%, transparent 75%)",
-                    boxShadow:
-                      "0 0 14px 1px rgba(56,189,248,0.65), 0 0 32px 6px rgba(129,140,248,0.35)",
-                  }}
-                />
-              </div>
-
+            <div className="relative isolate">
               <ul className="group/list space-y-2">
                 {PROJECTS.map((project, idx) => (
-                  <li key={project.href} className={idx < PROJECTS.length - 1 ? "mb-10" : ""}>
+                  <motion.li
+                    key={project.href}
+                    className={idx < PROJECTS.length - 1 ? "mb-10" : ""}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-8% 0px" }}
+                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                  >
                     <a
                       href={project.href}
                       className="group relative grid gap-4 pb-1 transition-all hover:!opacity-100 sm:grid-cols-8 sm:gap-8 md:gap-4 lg:group-hover/list:opacity-50"
@@ -630,7 +621,7 @@ export default function PortfolioPage() {
                         </div>
                       </div>
                     </a>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             </div>
