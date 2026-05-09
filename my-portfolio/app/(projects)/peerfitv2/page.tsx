@@ -8,6 +8,7 @@ import {
   peerfitV2Screenshots as ALL_SCREENSHOTS,
   projectPreviews,
 } from "@/lib/project-media";
+import PeerfitIntroStinger from "@/components/PeerfitIntroStinger";
 
 // Direction-aware slide-fade
 const slideVariants = {
@@ -99,6 +100,8 @@ export default function PeerfitV2Page() {
         `,
       }}
     >
+      <PeerfitIntroStinger />
+
       {/* Graph-paper grid */}
       <div
         className="pointer-events-none fixed inset-0 z-0"

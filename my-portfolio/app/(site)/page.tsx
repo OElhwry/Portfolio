@@ -2,8 +2,45 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import ProjectThumbnail from "@/components/ProjectThumbnail";
+import {
+  BackgroundAurora,
+  BackgroundVideo,
+  BG_VIDEOS,
+  CursorConstellation,
+  CursorCrosshair,
+  CursorEcho,
+  CursorGoo,
+  CursorRipple,
+  CursorSpotlight,
+  CursorTrail,
+  type BackgroundEffect,
+  type CursorEffect,
+} from "@/components/LabEffects";
+
+const LAB_EFFECTS: {
+  id: CursorEffect | BackgroundEffect;
+  kind: "cursor" | "background";
+  title: string;
+  description: string;
+}[] = [
+  { id: "constellation",  kind: "cursor",     title: "Constellation",description: "Click to draw stars" },
+  { id: "crosshair",      kind: "cursor",     title: "Crosshair",    description: "Live x,y readout" },
+  { id: "goo",            kind: "cursor",     title: "Mercury",      description: "Gooey trail" },
+  { id: "ripple",         kind: "cursor",     title: "Ripple",       description: "Water rings on click" },
+  { id: "echo",           kind: "cursor",     title: "Echo",         description: "Click for a word" },
+  { id: "trail",          kind: "cursor",     title: "Comet",        description: "Pointer trail" },
+  { id: "spotlight",      kind: "cursor",     title: "Spotlight",    description: "Dim outside cursor" },
+  { id: "aurora",         kind: "background", title: "Aurora",       description: "Drifting blobs" },
+  { id: "space",          kind: "background", title: "Nebula",       description: "Deep space" },
+  { id: "solar",          kind: "background", title: "Orbits",       description: "Solar system" },
+  { id: "earthblackhole", kind: "background", title: "Event horizon",description: "Earth & black hole" },
+  { id: "particle",       kind: "background", title: "Quanta",       description: "Drifting particles" },
+  { id: "grasssky",       kind: "background", title: "Meadow",       description: "Grass under sky" },
+  { id: "cityskyline",    kind: "background", title: "Skyline",      description: "Painted dusk" },
+  { id: "wildwest",       kind: "background", title: "Frontier",     description: "Desert horizon" },
+];
 
 const PROJECTS = [
   {
@@ -74,6 +111,80 @@ const PROJECTS = [
   },
 ];
 
+const LAB_TIPS: Partial<Record<CursorEffect, string>> = {
+  constellation: "Click anywhere to drop a star.",
+  echo: "Click anywhere to leave a word.",
+};
+
+const LAB_FADE_UP = {
+  hidden: { opacity: 0, y: 14 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const LAB_CHIP = {
+  hidden: { opacity: 0, y: 8, scale: 0.94 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+function LabChip({
+  title,
+  description,
+  active,
+  onClick,
+}: {
+  title: string;
+  description: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      title={description}
+      className="group relative inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/60"
+      style={{
+        background: active
+          ? "rgba(129,140,248,0.12)"
+          : "rgba(15,18,36,0.55)",
+        border: active
+          ? "1px solid rgba(129,140,248,0.55)"
+          : "1px solid rgba(99,102,241,0.18)",
+        color: active ? "rgb(199,210,254)" : "rgb(203,213,225)",
+        boxShadow: active
+          ? "inset 0 0 0 1px rgba(129,140,248,0.10), 0 0 18px -6px rgba(129,140,248,0.45)"
+          : "none",
+      }}
+    >
+      <span
+        aria-hidden="true"
+        className="h-1.5 w-1.5 rounded-full transition"
+        style={{
+          background: active ? "rgb(165,180,252)" : "rgb(71,85,105)",
+          boxShadow: active ? "0 0 8px rgba(129,140,248,0.8)" : "none",
+        }}
+      />
+      <span className="leading-none tracking-wide">{title}</span>
+      <span
+        className="text-[10px] uppercase tracking-[0.18em] transition"
+        style={{ color: active ? "rgb(129,140,248)" : "rgb(100,116,139)" }}
+      >
+        {active ? "on" : "off"}
+      </span>
+    </button>
+  );
+}
+
 const NOISE_SVG =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")";
 
@@ -84,6 +195,32 @@ export default function PortfolioPage() {
   const [activeSection, setActiveSection] = useState("about");
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
   const [copied, setCopied] = useState(false);
+  const [activeCursorFx, setActiveCursorFx] = useState<CursorEffect | null>(null);
+  const [activeBgFx, setActiveBgFx] = useState<BackgroundEffect | null>(null);
+  const [activeTip, setActiveTip] = useState<string | null>(null);
+
+  useEffect(() => {
+    const tip = activeCursorFx ? LAB_TIPS[activeCursorFx] : null;
+    if (!tip) {
+      setActiveTip(null);
+      return;
+    }
+    setActiveTip(tip);
+    const t = setTimeout(() => setActiveTip(null), 4500);
+    return () => clearTimeout(t);
+  }, [activeCursorFx]);
+
+  const toggleLab = (effect: (typeof LAB_EFFECTS)[number]) => {
+    if (effect.kind === "cursor") {
+      setActiveCursorFx((curr) =>
+        curr === effect.id ? null : (effect.id as CursorEffect)
+      );
+    } else {
+      setActiveBgFx((curr) =>
+        curr === effect.id ? null : (effect.id as BackgroundEffect)
+      );
+    }
+  };
 
   const copyEmail = () => {
     navigator.clipboard.writeText(EMAIL).then(() => {
@@ -134,31 +271,42 @@ export default function PortfolioPage() {
         background: "#070a12",
       }}
     >
-      {/* Aurora orbs — indigo/violet, distinct from project pages */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background: `
-            radial-gradient(60% 45% at 85% 8%, rgba(129,140,248,0.16) 0%, transparent 70%),
-            radial-gradient(50% 40% at 8% 92%, rgba(14,165,233,0.10) 0%, transparent 70%),
-            radial-gradient(40% 35% at 50% 50%, rgba(167,139,250,0.05) 0%, transparent 80%)
-          `,
-        }}
-      />
+      {/* Default backgrounds — replaced by Lab background effects when active */}
+      {activeBgFx === null && (
+        <>
+          {/* Aurora orbs — indigo/violet, distinct from project pages */}
+          <div
+            className="pointer-events-none fixed inset-0 z-0"
+            style={{
+              background: `
+                radial-gradient(60% 45% at 85% 8%, rgba(129,140,248,0.16) 0%, transparent 70%),
+                radial-gradient(50% 40% at 8% 92%, rgba(14,165,233,0.10) 0%, transparent 70%),
+                radial-gradient(40% 35% at 50% 50%, rgba(167,139,250,0.05) 0%, transparent 80%)
+              `,
+            }}
+          />
 
-      {/* Fine dot field (replaces the grid) */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.55]"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(148,163,184,0.22) 1px, transparent 1px)",
-          backgroundSize: "22px 22px",
-          maskImage:
-            "radial-gradient(ellipse 90% 70% at 50% 40%, #000 50%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 90% 70% at 50% 40%, #000 50%, transparent 100%)",
-        }}
-      />
+          {/* Fine dot field (replaces the grid) */}
+          <div
+            className="pointer-events-none fixed inset-0 z-0 opacity-[0.55]"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgba(148,163,184,0.22) 1px, transparent 1px)",
+              backgroundSize: "22px 22px",
+              maskImage:
+                "radial-gradient(ellipse 90% 70% at 50% 40%, #000 50%, transparent 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 90% 70% at 50% 40%, #000 50%, transparent 100%)",
+            }}
+          />
+        </>
+      )}
+
+      {/* Lab background effects */}
+      {activeBgFx === "aurora" && <BackgroundAurora />}
+      {activeBgFx && activeBgFx !== "aurora" && (
+        <BackgroundVideo src={BG_VIDEOS[activeBgFx]} />
+      )}
 
       {/* Film grain */}
       <div
@@ -166,13 +314,49 @@ export default function PortfolioPage() {
         style={{ backgroundImage: NOISE_SVG, backgroundSize: "240px 240px" }}
       />
 
-      {/* Soft spotlight that follows the cursor */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0 transition duration-500"
-        style={{
-          background: `radial-gradient(520px at ${cursor.x}px ${cursor.y}px, rgba(165,180,252,0.07), transparent 75%)`,
-        }}
-      />
+      {/* Default cursor spotlight — replaced by Lab cursor effects when active */}
+      {activeCursorFx === null && (
+        <div
+          className="pointer-events-none fixed inset-0 z-0 transition duration-500"
+          style={{
+            background: `radial-gradient(520px at ${cursor.x}px ${cursor.y}px, rgba(165,180,252,0.07), transparent 75%)`,
+          }}
+        />
+      )}
+
+      {/* Lab cursor effects */}
+      {activeCursorFx === "trail" && <CursorTrail />}
+      {activeCursorFx === "spotlight" && <CursorSpotlight />}
+      {activeCursorFx === "constellation" && <CursorConstellation />}
+      {activeCursorFx === "crosshair" && <CursorCrosshair />}
+      {activeCursorFx === "goo" && <CursorGoo />}
+      {activeCursorFx === "ripple" && <CursorRipple />}
+      {activeCursorFx === "echo" && <CursorEcho />}
+
+      {/* Lab effect tip */}
+      <AnimatePresence mode="wait">
+        {activeTip && (
+          <motion.div
+            key={activeTip}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="pointer-events-none fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium text-indigo-100 backdrop-blur-md"
+            style={{
+              background: "rgba(15,18,36,0.78)",
+              border: "1px solid rgba(129,140,248,0.4)",
+              boxShadow: "0 8px 24px -8px rgba(129,140,248,0.45)",
+            }}
+          >
+            <span
+              className="mr-2 inline-block h-1.5 w-1.5 -translate-y-px rounded-full bg-indigo-300 align-middle"
+              style={{ boxShadow: "0 0 8px rgba(129,140,248,0.8)" }}
+            />
+            {activeTip}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Vignette to anchor the page */}
       <div
@@ -547,19 +731,77 @@ export default function PortfolioPage() {
             </div>
 
             {/* CTA — sets the expectation that each card opens its own page */}
-            <p className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-400">
-              <span
+            <motion.p
+              className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-400"
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-10% 0px" }}
+              variants={{
+                hidden: {},
+                show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
+              }}
+            >
+              <motion.span
                 aria-hidden="true"
-                className="inline-block h-px w-6"
+                className="inline-block h-px origin-left"
                 style={{
                   background:
                     "linear-gradient(to right, transparent, rgba(129,140,248,0.55))",
                 }}
+                variants={{
+                  hidden: { width: 0, opacity: 0 },
+                  show: {
+                    width: "1.5rem",
+                    opacity: 1,
+                    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+                  },
+                }}
               />
-              <span className="text-slate-300">Tap any project</span>
-              <span>for the full breakdown</span>
-              <span aria-hidden="true" className="text-sky-400/70">→</span>
-            </p>
+              {[
+                { text: "Tap any project", className: "text-slate-300" },
+                { text: "for the full breakdown" },
+              ].map((part) => (
+                <motion.span
+                  key={part.text}
+                  className={part.className}
+                  variants={{
+                    hidden: { opacity: 0, y: 6 },
+                    show: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+                    },
+                  }}
+                >
+                  {part.text}
+                </motion.span>
+              ))}
+              <motion.span
+                aria-hidden="true"
+                className="inline-block text-sky-400/70"
+                variants={{
+                  hidden: { opacity: 0, x: -6 },
+                  show: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+                  },
+                }}
+              >
+                <motion.span
+                  className="inline-block"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{
+                    duration: 1.6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.8,
+                  }}
+                >
+                  →
+                </motion.span>
+              </motion.span>
+            </motion.p>
 
             <div className="relative isolate">
               <ul className="group/list space-y-2">
@@ -669,6 +911,171 @@ export default function PortfolioPage() {
                 </Link>
               </div>
             </div>
+          </motion.section>
+
+          {/* ── LAB ── */}
+          <motion.section
+            aria-label="Lab"
+            className="scroll-mt-24"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.22, delayChildren: 0.15 } },
+            }}
+          >
+            {/* Drawing-in divider — first signal something new is here */}
+            <motion.div
+              aria-hidden="true"
+              className="mb-6 h-px origin-left"
+              style={{
+                background:
+                  "linear-gradient(to right, rgba(129,140,248,0.55), rgba(56,189,248,0.35) 40%, transparent)",
+              }}
+              variants={{
+                hidden: { scaleX: 0, opacity: 0 },
+                show: {
+                  scaleX: 1,
+                  opacity: 1,
+                  transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] },
+                },
+              }}
+            />
+
+            <motion.p
+              className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-sky-400/55"
+              variants={LAB_FADE_UP}
+            >
+              Lab
+            </motion.p>
+
+            {/* Heading: each word pops in with a blur-clear */}
+            <motion.h3
+              className="text-xl font-semibold tracking-wide text-slate-100"
+              variants={{
+                hidden: {},
+                show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+              }}
+            >
+              {["You", "made", "it", "this", "far?"].map((word) => (
+                <motion.span
+                  key={word}
+                  className="mr-[0.28em] inline-block"
+                  variants={{
+                    hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+                    show: {
+                      opacity: 1,
+                      y: 0,
+                      filter: "blur(0px)",
+                      transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] },
+                    },
+                  }}
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </motion.h3>
+
+            <motion.p
+              className="mt-2 mb-6 text-sm leading-relaxed text-slate-400"
+              variants={LAB_FADE_UP}
+            >
+              Tap a tile to try it on the page. Tap again to turn it off. One
+              cursor and one background can run at a time.
+            </motion.p>
+
+            {/* Cursor group */}
+            <motion.div className="mb-5" variants={LAB_FADE_UP}>
+              <div className="mb-2 flex items-center gap-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  Cursor
+                </span>
+                <motion.span
+                  aria-hidden="true"
+                  className="h-px flex-1 origin-left"
+                  style={{
+                    background:
+                      "linear-gradient(to right, rgba(99,102,241,0.25), transparent)",
+                  }}
+                  variants={{
+                    hidden: { scaleX: 0 },
+                    show: {
+                      scaleX: 1,
+                      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+                    },
+                  }}
+                />
+              </div>
+              <motion.div
+                className="flex flex-wrap gap-2"
+                variants={{
+                  hidden: {},
+                  show: { transition: { staggerChildren: 0.06 } },
+                }}
+              >
+                {LAB_EFFECTS.filter((e) => e.kind === "cursor").map((effect) => {
+                  const active = activeCursorFx === effect.id;
+                  return (
+                    <motion.div key={effect.id} variants={LAB_CHIP}>
+                      <LabChip
+                        title={effect.title}
+                        description={effect.description}
+                        active={active}
+                        onClick={() => toggleLab(effect)}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            </motion.div>
+
+            {/* Background group */}
+            <motion.div variants={LAB_FADE_UP}>
+              <div className="mb-2 flex items-center gap-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  Background
+                </span>
+                <motion.span
+                  aria-hidden="true"
+                  className="h-px flex-1 origin-left"
+                  style={{
+                    background:
+                      "linear-gradient(to right, rgba(99,102,241,0.25), transparent)",
+                  }}
+                  variants={{
+                    hidden: { scaleX: 0 },
+                    show: {
+                      scaleX: 1,
+                      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+                    },
+                  }}
+                />
+              </div>
+              <motion.div
+                className="flex flex-wrap gap-2"
+                variants={{
+                  hidden: {},
+                  show: { transition: { staggerChildren: 0.05 } },
+                }}
+              >
+                {LAB_EFFECTS.filter((e) => e.kind === "background").map(
+                  (effect) => {
+                    const active = activeBgFx === effect.id;
+                    return (
+                      <motion.div key={effect.id} variants={LAB_CHIP}>
+                        <LabChip
+                          title={effect.title}
+                          description={effect.description}
+                          active={active}
+                          onClick={() => toggleLab(effect)}
+                        />
+                      </motion.div>
+                    );
+                  }
+                )}
+              </motion.div>
+            </motion.div>
           </motion.section>
 
         </div>
