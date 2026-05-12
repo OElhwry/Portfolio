@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { emplorioScreenshots as SCREENSHOTS } from "@/lib/project-media";
+import EmplorioIntroStinger from "@/components/EmplorioIntroStinger";
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 36 : -36, opacity: 0, scale: 0.99 }),
@@ -84,6 +85,8 @@ export default function EmplorioPage() {
         `,
       }}
     >
+      <EmplorioIntroStinger />
+
       {/* ── AMBIENT BACKGROUND (drifting orbs + dot field) ── */}
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
         {/* Far layer: sparse dots */}

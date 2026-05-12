@@ -11,13 +11,13 @@ import { useEffect, useState } from "react";
  *   1.7s   teal hairline draws beneath the wordmark
  *   1.9s   mono tagline appears: "FIND PEOPLE · PLAY SPORTS · STAY ACTIVE"
  *   2.3s   status row appears: "[ READY ]"
- *   2.6s   whole stinger lifts up + fades; page revealed beneath
- *   3.0s   done
+ *   2.9s   whole stinger lifts up + fades; page revealed beneath
+ *   3.5s   done
  *
  * Plays once per mount. Skippable on click / keypress. Respects reduced-motion.
  */
 
-const TOTAL_MS = 3000;
+const TOTAL_MS = 3500;
 
 type Phase = "playing" | "done";
 
@@ -119,7 +119,7 @@ export default function PeerfitIntroStinger() {
             radial-gradient(ellipse 80% 55% at 50% 50%, rgba(20,184,166,0.10) 0%, transparent 70%),
             #060d12
           `,
-          animation: "pf-lift 600ms cubic-bezier(.7,0,.3,1) 2600ms forwards",
+          animation: "pf-lift 600ms cubic-bezier(.7,0,.3,1) 2900ms forwards",
         }}
       >
         {/* Graph-paper grid — same as the page, anchors the intro to the project */}

@@ -10,6 +10,7 @@ import {
   CapricornConstellation,
   LeoConstellation,
 } from "@/components/Constellations";
+import AphelionIntroStinger from "@/components/AphelionIntroStinger";
 
 // Seeded PRNG so server and client produce identical star positions (fixes hydration mismatch)
 function mulberry32(seed: number) {
@@ -167,27 +168,30 @@ export default function AphelionPage() {
 
   return (
     <main
-      className="relative text-slate-400 antialiased selection:bg-indigo-500 selection:text-white"
+      className="relative text-white/55 antialiased selection:bg-white selection:text-black"
       style={{
+        // Matches the live aphelion.website landing — near-black void, faint warm glow
+        // from below (suggesting an unseen Earth horizon), starfield carries the rest.
         background: `
-          radial-gradient(ellipse 90% 55% at 12% 0%, rgba(99,102,241,0.11) 0%, transparent 100%),
-          radial-gradient(ellipse 70% 45% at 88% 18%, rgba(139,92,246,0.08) 0%, transparent 100%),
-          radial-gradient(ellipse 50% 30% at 50% 100%, rgba(30,27,75,0.4) 0%, transparent 100%),
-          #080d18
+          radial-gradient(ellipse 60% 35% at 50% 110%, rgba(80,170,255,0.10) 0%, transparent 70%),
+          radial-gradient(ellipse 90% 50% at 50% -10%, rgba(8,16,32,0.55) 0%, transparent 100%),
+          #02040a
         `,
       }}
     >
+      <AphelionIntroStinger />
+
       {/* Back link */}
       <div className="fixed top-6 left-6 z-50">
-        <Link href="/" className="text-sm font-medium text-slate-500 transition hover:text-indigo-300">
+        <Link href="/" className="text-sm font-medium text-white/45 transition hover:text-white">
           &larr; Back to Portfolio
         </Link>
       </div>
 
-      {/* Cursor nebula glow */}
+      {/* Cursor glow — soft white, matches the editorial restraint */}
       <div
         className="pointer-events-none fixed inset-0 z-0 transition duration-300"
-        style={{ background: `radial-gradient(600px at ${cursor.x}px ${cursor.y}px, rgba(99,102,241,0.13), transparent 80%)` }}
+        style={{ background: `radial-gradient(560px at ${cursor.x}px ${cursor.y}px, rgba(120,180,255,0.06), transparent 80%)` }}
       />
 
       {/* Starfield */}
@@ -209,21 +213,27 @@ export default function AphelionPage() {
         {/* ── LEFT PANEL ── */}
         <header className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[46%] lg:flex-col lg:justify-between lg:py-24">
           <div>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-indigo-400/50">
-              Space Explorer
+            <p
+              className="mb-5 text-[10px] uppercase tracking-[0.38em] text-white/75 sm:text-xs"
+              style={{ fontFamily: "var(--font-orbitron), 'Orbitron', system-ui, sans-serif" }}
+            >
+              Solar System Explorer
             </p>
             <h1
-              className="text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl"
-              style={{ textShadow: "0 0 50px rgba(129,140,248,0.28), 0 0 100px rgba(99,102,241,0.12)" }}
+              className="text-5xl uppercase text-white sm:text-6xl"
+              style={{
+                fontFamily:
+                  "var(--font-playfair), 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', serif",
+                fontWeight: 500,
+                letterSpacing: "0.14em",
+                lineHeight: 1.05,
+              }}
             >
               Aphelion
             </h1>
-            <div className="mt-2 h-px w-16 bg-gradient-to-r from-indigo-400/70 to-transparent" />
-            <h2 className="mt-3 text-lg font-mono font-medium text-indigo-300/80 sm:text-xl">
-              Solar system explorer
-            </h2>
-            <p className="mt-4 max-w-xs leading-relaxed text-slate-400">
-              A scroll-driven journey through ten worlds. From the blazing Sun to the frozen edge, 5.9 billion kilometres.
+            <div className="mt-5 h-px w-20 bg-white/30" />
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/55">
+              A cinematic, interactive journey through the solar system. Ten worlds, fifty questions, 5.9&nbsp;billion kilometres.
             </p>
 
             {/* Tech badges */}
@@ -241,7 +251,7 @@ export default function AphelionPage() {
               ].map((tech) => (
                 <div
                   key={tech.name}
-                  className="inline-flex items-center gap-2 rounded-md border border-white/5 bg-white/5 px-3 py-1 text-xs text-slate-200 backdrop-blur-sm transition hover:scale-[1.05] hover:border-violet-400/40 hover:bg-indigo-950/40"
+                  className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/85 backdrop-blur-sm transition hover:scale-[1.05] hover:border-white/30 hover:bg-white/10"
                 >
                   <span className="inline-block h-2 w-2 rounded-full" style={{ background: tech.color }} />
                   <span className="font-medium">{tech.name}</span>
@@ -258,10 +268,13 @@ export default function AphelionPage() {
                     <li key={id}>
                       <a
                         href={`#${id}`}
-                        className={`group flex items-center py-2 transition-colors ${active ? "text-indigo-300" : "text-slate-500"}`}
+                        className={`group flex items-center py-2 transition-colors ${active ? "text-white" : "text-white/40"}`}
                       >
-                        <span className={`mr-4 h-px transition-all ${active ? "w-16 bg-indigo-400" : "w-8 bg-slate-700 group-hover:w-16 group-hover:bg-slate-400"}`} />
-                        <span className={`text-xs font-semibold uppercase tracking-widest transition-colors ${active ? "text-indigo-300" : "group-hover:text-slate-200"}`}>
+                        <span className={`mr-4 h-px transition-all ${active ? "w-16 bg-white/85" : "w-8 bg-white/15 group-hover:w-16 group-hover:bg-white/55"}`} />
+                        <span
+                          className={`text-[10px] font-medium uppercase tracking-[0.32em] transition-colors ${active ? "text-white" : "group-hover:text-white/85"}`}
+                          style={{ fontFamily: "var(--font-orbitron), 'Orbitron', system-ui, sans-serif" }}
+                        >
                           {id.charAt(0).toUpperCase() + id.slice(1)}
                         </span>
                       </a>
@@ -272,24 +285,27 @@ export default function AphelionPage() {
             </nav>
           </div>
 
-          {/* CTAs */}
-          <div className="mt-10 flex flex-col gap-3">
+          {/* CTAs — matches the live site's white pill "GET STARTED" */}
+          <div className="mt-10 flex flex-col items-start gap-4">
             <Link
               href="https://aphelion.website"
               target="_blank"
               rel="noreferrer"
-              className="group inline-flex items-center gap-3 self-start border border-indigo-500/30 bg-indigo-500/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-300 backdrop-blur-sm transition hover:border-indigo-400/55 hover:bg-indigo-500/18 hover:text-white"
-              style={{ borderRadius: "3px" }}
+              className="group inline-flex items-center gap-3 rounded-full border border-white/25 bg-white px-8 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-black transition hover:bg-white/90 sm:px-10"
+              style={{
+                fontFamily: "var(--font-orbitron), 'Orbitron', system-ui, sans-serif",
+                boxShadow: "0 0 45px rgba(80,170,255,0.20)",
+              }}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 group-hover:animate-pulse" />
-              Begin Mission
-              <span className="inline-block transition-transform group-hover:translate-x-0.5 text-indigo-500 group-hover:text-indigo-300">→</span>
+              Get Started
+              <span className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
             </Link>
             <Link
               href="https://github.com/OElhwry/Aphelion"
               target="_blank"
               rel="noreferrer"
-              className="inline-block text-sm font-medium text-indigo-400/60 transition hover:text-indigo-300"
+              className="inline-block text-[11px] uppercase tracking-[0.28em] text-white/45 transition hover:text-white/85"
+              style={{ fontFamily: "var(--font-orbitron), 'Orbitron', system-ui, sans-serif" }}
             >
               View on GitHub &rarr;
             </Link>
@@ -307,18 +323,18 @@ export default function AphelionPage() {
             </p>
             <p>
               Scroll pacing drives everything. Each planet appears in sequence, with its own facts, orbital data, and a set of quiz questions before you continue. Fifty questions in total, spread across ten worlds, with a{" "}
-              <span className="text-slate-200 font-medium">distance HUD</span>{" "}
+              <span className="text-white/85 font-medium">distance HUD</span>{" "}
               that tracks your progress in millions of kilometres so the sense of scale stays present throughout.
             </p>
             <p>
               Built with{" "}
-              <span className="text-slate-200 font-medium">
+              <span className="text-white/85 font-medium">
                 <a href="https://nextjs.org" target="_blank" rel="noreferrer">Next.js 14</a>
               </span>
               ,{" "}
-              <span className="text-slate-200 font-medium">TypeScript</span>
+              <span className="text-white/85 font-medium">TypeScript</span>
               , and{" "}
-              <span className="text-slate-200 font-medium">
+              <span className="text-white/85 font-medium">
                 <a href="https://www.framer.com/motion/" target="_blank" rel="noreferrer">Framer Motion</a>
               </span>{" "}
               for scroll-triggered animation. The quiz engine and all planetary content are authored directly, with no external API dependency, keeping the experience fast, consistent, and fully offline-capable.
@@ -334,10 +350,23 @@ export default function AphelionPage() {
           >
             <CapricornConstellation className="-top-8 -left-16 h-[440px] w-[440px] -z-10 opacity-60" />
             <div className="mb-7">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-indigo-400/45">
+              <p
+                className="mb-3 text-[10px] uppercase tracking-[0.38em] text-white/55"
+                style={{ fontFamily: "var(--font-orbitron), 'Orbitron', system-ui, sans-serif" }}
+              >
                 What it does
               </p>
-              <h3 className="text-xl font-semibold tracking-wide text-slate-100">Key features</h3>
+              <h3
+                className="text-3xl uppercase text-white"
+                style={{
+                  fontFamily:
+                    "var(--font-playfair), 'Playfair Display', 'Cormorant Garamond', serif",
+                  fontWeight: 500,
+                  letterSpacing: "0.10em",
+                }}
+              >
+                Key features
+              </h3>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -380,20 +409,30 @@ export default function AphelionPage() {
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="rounded-xl p-4 transition-all hover:border-indigo-400/25"
+                  className="rounded-xl p-4 transition-all hover:border-white/25"
                   style={{
-                    background: "rgba(10,12,35,0.55)",
-                    border: "1px solid rgba(99,102,241,0.12)",
+                    background: "rgba(8,12,22,0.55)",
+                    border: "1px solid rgba(255,255,255,0.07)",
                   }}
                 >
                   <div
-                    className="mb-3 inline-flex items-center justify-center rounded-lg p-2 text-indigo-400"
-                    style={{ background: "rgba(99,102,241,0.10)" }}
+                    className="mb-3 inline-flex items-center justify-center rounded-lg p-2 text-white/85"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
                   >
                     {f.icon}
                   </div>
-                  <h4 className="mb-1.5 text-sm font-semibold text-slate-200">{f.title}</h4>
-                  <p className="text-xs leading-relaxed text-slate-400">{f.body}</p>
+                  <h4
+                    className="mb-2 text-base text-white"
+                    style={{
+                      fontFamily:
+                        "var(--font-playfair), 'Playfair Display', 'Cormorant Garamond', serif",
+                      fontWeight: 500,
+                      letterSpacing: "0.02em",
+                    }}
+                  >
+                    {f.title}
+                  </h4>
+                  <p className="text-xs leading-relaxed text-white/55">{f.body}</p>
                 </div>
               ))}
             </div>
@@ -409,29 +448,42 @@ export default function AphelionPage() {
           >
             {/* Header */}
             <div className="mb-8 flex flex-col items-center text-center">
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-indigo-400/50">
+              <p
+                className="mb-3 text-[10px] uppercase tracking-[0.38em] text-white/55"
+                style={{ fontFamily: "var(--font-orbitron), 'Orbitron', system-ui, sans-serif" }}
+              >
                 Mission Briefing
               </p>
-              <h3 className="text-2xl font-semibold tracking-wide text-slate-100">Aphelion Gallery</h3>
-              <p className="mt-2 max-w-md text-sm text-slate-400">
+              <h3
+                className="text-3xl uppercase text-white"
+                style={{
+                  fontFamily:
+                    "var(--font-playfair), 'Playfair Display', 'Cormorant Garamond', serif",
+                  fontWeight: 500,
+                  letterSpacing: "0.12em",
+                }}
+              >
+                Aphelion Gallery
+              </h3>
+              <p className="mt-3 max-w-md text-sm text-white/55">
                 Ten worlds. Fifty questions. 5.9 billion kilometres.
               </p>
-              <div className="mt-4 h-px w-32 rounded-full bg-gradient-to-r from-transparent via-indigo-400/70 to-transparent" />
+              <div className="mt-5 h-px w-24 bg-white/25" />
             </div>
 
             {/* Slideshow card */}
             <div
               className="rounded-2xl p-4 shadow-xl sm:p-5"
               style={{
-                background: "rgba(10,12,35,0.65)",
-                border: "1px solid rgba(99,102,241,0.15)",
+                background: "rgba(8,12,22,0.65)",
+                border: "1px solid rgba(255,255,255,0.08)",
                 backdropFilter: "blur(6px)",
               }}
             >
               {/* ── Featured image ── */}
               <div
                 className="relative overflow-hidden rounded-xl"
-                style={{ aspectRatio: "16/9", background: "#060a18" }}
+                style={{ aspectRatio: "16/9", background: "#02040a" }}
               >
                 <AnimatePresence initial={false} custom={direction} mode="wait">
                   <motion.div
@@ -454,7 +506,7 @@ export default function AphelionPage() {
                     {/* Bottom fade for caption legibility */}
                     <div
                       className="absolute inset-x-0 bottom-0 h-20"
-                      style={{ background: "linear-gradient(to top, rgba(6,10,24,0.80) 0%, transparent 100%)" }}
+                      style={{ background: "linear-gradient(to top, rgba(0,5,16,0.85) 0%, transparent 100%)" }}
                     />
                   </motion.div>
                 </AnimatePresence>
@@ -463,10 +515,10 @@ export default function AphelionPage() {
                 <button
                   onClick={goPrev}
                   aria-label="Previous image"
-                  className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-300 backdrop-blur-sm transition hover:text-white focus-visible:outline-none"
+                  className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-white/70 backdrop-blur-sm transition hover:text-white focus-visible:outline-none"
                   style={{
-                    background: "rgba(8,13,36,0.55)",
-                    border: "1px solid rgba(99,102,241,0.22)",
+                    background: "rgba(2,4,10,0.65)",
+                    border: "1px solid rgba(255,255,255,0.18)",
                   }}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
@@ -478,10 +530,10 @@ export default function AphelionPage() {
                 <button
                   onClick={goNext}
                   aria-label="Next image"
-                  className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-300 backdrop-blur-sm transition hover:text-white focus-visible:outline-none"
+                  className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-white/70 backdrop-blur-sm transition hover:text-white focus-visible:outline-none"
                   style={{
-                    background: "rgba(8,13,36,0.55)",
-                    border: "1px solid rgba(99,102,241,0.22)",
+                    background: "rgba(2,4,10,0.65)",
+                    border: "1px solid rgba(255,255,255,0.18)",
                   }}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
@@ -489,10 +541,14 @@ export default function AphelionPage() {
                   </svg>
                 </button>
 
-                {/* Counter */}
+                {/* Counter — keep an Orbitron-styled HUD readout (matches the live site's tickers) */}
                 <div
-                  className="absolute top-3 right-3 z-10 rounded px-2 py-0.5 font-mono text-[11px] text-indigo-200"
-                  style={{ background: "rgba(8,13,36,0.65)", border: "1px solid rgba(99,102,241,0.18)" }}
+                  className="absolute top-3 right-3 z-10 rounded px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-cyan-300/85"
+                  style={{
+                    fontFamily: "var(--font-orbitron), 'Orbitron', system-ui, sans-serif",
+                    background: "rgba(2,4,10,0.70)",
+                    border: "1px solid rgba(0,212,255,0.25)",
+                  }}
                 >
                   {current + 1} / {SCREENSHOTS.length}
                 </div>
@@ -506,7 +562,7 @@ export default function AphelionPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       transition={{ duration: 0.2 }}
-                      className="text-xs font-medium tracking-wide text-slate-200"
+                      className="text-xs font-medium tracking-wide text-white/85"
                     >
                       {SCREENSHOTS[current].caption}
                     </motion.p>
@@ -533,10 +589,10 @@ export default function AphelionPage() {
                         width: "76px",
                         height: "52px",
                         border: isActive
-                          ? "2px solid rgba(139,92,246,0.85)"
-                          : "2px solid rgba(99,102,241,0.12)",
+                          ? "2px solid rgba(255,255,255,0.85)"
+                          : "2px solid rgba(255,255,255,0.10)",
                         opacity: isActive ? 1 : 0.45,
-                        boxShadow: isActive ? "0 0 10px rgba(139,92,246,0.35)" : "none",
+                        boxShadow: isActive ? "0 0 12px rgba(255,255,255,0.20)" : "none",
                       }}
                       onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.opacity = "0.75"; }}
                       onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.opacity = "0.45"; }}
@@ -554,10 +610,10 @@ export default function AphelionPage() {
               </div>
 
               {/* Progress bar */}
-              <div className="mt-3 h-px w-full rounded-full" style={{ background: "rgba(99,102,241,0.12)" }}>
+              <div className="mt-3 h-px w-full rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: "linear-gradient(to right, rgba(99,102,241,0.6), rgba(139,92,246,0.8))" }}
+                  style={{ background: "linear-gradient(to right, rgba(255,255,255,0.55), rgba(255,255,255,0.95))" }}
                   animate={{ width: `${((current + 1) / SCREENSHOTS.length) * 100}%` }}
                   transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 />

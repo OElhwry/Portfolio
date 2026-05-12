@@ -119,7 +119,7 @@ function Constellation({
             return (
               <motion.g key={i}
                 initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: p.lead ? 0.55 : r >= 3.5 ? 0.45 : 0.32, scale: 1 }}
+                whileInView={{ opacity: p.lead ? 0.65 : r >= 3.5 ? 0.55 : 0.42, scale: 1 }}
                 viewport={VP}
                 transition={{ duration: STAR_DURATION, delay: STAR_BASE_DELAY + i * STAR_STAGGER, ease: [0.34, 1.56, 0.64, 1] }}
                 style={r >= 3.5 ? { filter: "drop-shadow(0 0 4px rgba(232,217,138,0.35))" } : undefined}
@@ -150,7 +150,7 @@ function Constellation({
           height={imageH}
           preserveAspectRatio="xMidYMid meet"
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.1 }}
+          whileInView={{ opacity: 0.14 }}
           viewport={VP}
           transition={{ duration: IMAGE_DURATION, delay: imageDelay, ease: "easeIn" }}
           style={{

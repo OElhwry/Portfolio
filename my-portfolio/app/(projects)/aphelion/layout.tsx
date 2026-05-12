@@ -1,4 +1,23 @@
 import type { Metadata } from "next";
+import { Orbitron, Playfair_Display } from "next/font/google";
+
+// Two fonts the live aphelion.website actually uses, exposed as CSS variables
+// scoped to this page only:
+//   - Playfair Display: editorial serif for the "Aphelion" wordmark + section headings
+//   - Orbitron: technical / HUD labels (counters, eyebrows, planet stat readouts)
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-orbitron",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-playfair",
+  display: "swap",
+});
 
 const TITLE = "Aphelion";
 const DESCRIPTION =
@@ -26,5 +45,9 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <div className={`${orbitron.variable} ${playfair.variable}`}>
+      {children}
+    </div>
+  );
 }

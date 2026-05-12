@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { deadcenterScreenshots as SCREENSHOTS } from "@/lib/project-media";
+import DeadcenterIntroStinger from "@/components/DeadcenterIntroStinger";
 
 // Direction-aware slide-fade
 const slideVariants = {
@@ -77,6 +78,8 @@ export default function DeadcenterPage() {
         `,
       }}
     >
+      <DeadcenterIntroStinger />
+
       {/* Scanline overlay — very faint CRT / arcade-monitor texture */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
