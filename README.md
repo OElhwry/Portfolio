@@ -136,4 +136,4 @@ To update the CV, replace the file in `public/` and keep the same filename, or u
 
 ## Contact
 
-**omar.elhawary@hotmail.co.uk** · [oelhawary.com](https://oelhawary.com) · [linkedin.com/in/oelhawary](https://linkedin.com/in/oelhawary)
+**omar@oelhawary.com** · [oelhawary.com](https://oelhawary.com) · [linkedin.com/in/oelhawary](https://linkedin.com/in/oelhawary)

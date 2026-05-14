@@ -188,7 +188,7 @@ function LabChip({
 const NOISE_SVG =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")";
 
-const EMAIL = "omar.elhawary@hotmail.co.uk";
+const EMAIL = "omar@oelhawary.com";
 
 export default function PortfolioPage() {
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
@@ -588,7 +588,7 @@ export default function PortfolioPage() {
             </li>
             <li className="order-last w-full sm:order-none sm:ml-auto sm:w-auto">
               <Link
-                href="mailto:omar.elhawary@hotmail.co.uk"
+                href="mailto:omar@oelhawary.com"
                 className="group inline-flex w-full items-center justify-center gap-2 border border-sky-500/30 bg-sky-500/10 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300 backdrop-blur-sm transition hover:border-sky-400/55 hover:bg-sky-500/15 hover:text-white focus-visible:outline-none sm:w-auto sm:py-2"
                 style={{ borderRadius: "3px" }}
               >
@@ -893,7 +893,7 @@ export default function PortfolioPage() {
               </p>
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <Link
-                  href="mailto:omar.elhawary@hotmail.co.uk"
+                  href="mailto:omar@oelhawary.com"
                   className="group inline-flex items-center gap-3 border border-sky-500/30 bg-sky-500/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-300 backdrop-blur-sm transition hover:border-sky-400/55 hover:bg-sky-500/15 hover:text-white focus-visible:outline-none"
                   style={{ borderRadius: "3px" }}
                 >
