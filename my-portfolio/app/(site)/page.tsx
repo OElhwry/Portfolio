@@ -569,11 +569,9 @@ export default function PortfolioPage() {
               )}
             </li>
             <li>
-              {/* CV download — replace href with your CV file (e.g. "/omar-elhawary-cv.pdf" once placed in /public) */}
               <a
-                href="/omar-elhawary-cv-software.pdf"
-                target="_blank"
-                rel="noreferrer"
+                href="/cv/OmarElhawaryCV.pdf"
+                download
                 aria-label="Download CV"
                 title="Download CV"
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm transition hover:border-indigo-400/35 hover:bg-indigo-950/30 hover:text-indigo-300"

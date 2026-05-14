@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { splidItScreenshots as SCREENSHOTS } from "@/lib/project-media";
+import SplidItIntroStinger from "@/components/SplidItIntroStinger";
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 24 : -24, opacity: 0 }),
@@ -66,6 +67,8 @@ export default function SplidItPage() {
         `,
       }}
     >
+      <SplidItIntroStinger />
+
       {/* Dot grid overlay */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
